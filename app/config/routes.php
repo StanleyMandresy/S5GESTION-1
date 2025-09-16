@@ -1,17 +1,21 @@
 <?php
 use flight\Engine;
 use flight\net\Router;
+use app\controllers\QCMcontroller;
 //use Flight;
 
 /** 
  * @var Router $router 
  * @var Engine $app
  */
-/*$router->get('/', function() use ($app) {
-	$Welcome_Controller = new WelcomeController($app);
-	$app->render('welcome', [ 'message' => 'It works!!' ]);
+// $router->get('/', function() use ($app) {
+// 	$Welcome_Controller = new WelcomeController($app);
+// 	$app->render('welcome', [ 'message' => 'It works!!' ]);
 
-});*/
+// });
+
+$QCMcontroller = new QCMcontroller();
+$router->get('/qcm', [$QCMcontroller, 'accueil']);
 
 
 $router->get('/hello-world/@name', function($name) {
