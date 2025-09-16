@@ -1,3 +1,6 @@
+create database Recrutement;
+use Recrutement;
+
 create table Notification(
 id
 idCandidat

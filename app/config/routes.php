@@ -1,6 +1,4 @@
 <?php
-
-
 use flight\Engine;
 use flight\net\Router;
 //use Flight;
