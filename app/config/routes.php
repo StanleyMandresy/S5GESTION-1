@@ -16,6 +16,9 @@ use app\controllers\QCMcontroller;
 
 $QCMcontroller = new QCMcontroller();
 $router->get('/qcm', [$QCMcontroller, 'accueil']);
+$router->post('/EnregistrerReponse',[$QCMcontroller,'getReponsesCandidat']);
+$router->get('/showResults', [$QCMcontroller, 'showResults']);
+$router->get('/MessageDeConfirmation',[$QCMcontroller,'MessageDeConfirmation']);
 
 
 $router->get('/hello-world/@name', function($name) {

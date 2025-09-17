@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QCM Département</title>
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- DaisyUI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4F46E5',
-                        secondary: '#7C3AED',
+                        light: '#DCDED6',
+                        lightAlt: '#CED0C3',
+                        medium: '#B4BAB1',
+                        dark: '#859393',
+                        darker: '#5D726F',
                     }
                 }
             }
@@ -24,49 +24,81 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        :root {
+            --color-light: #DCDED6;
+            --color-light-alt: #CED0C3;
+            --color-medium: #B4BAB1;
+            --color-dark: #859393;
+            --color-darker: #5D726F;
+        }
+        
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(120deg, #f0f9ff 0%, #e0f2fe 100%);
+            background: linear-gradient(135deg, var(--color-light) 0%, var(--color-light-alt) 100%);
             min-height: 100vh;
         }
-        .question-card {
+        
+        .header-icon {
+            color: var(--color-darker);
+            background-color: var(--color-light-alt);
+            border: 3px solid var(--color-dark);
+        }
+        
+        .option-card {
             transition: all 0.3s ease;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        input[type="checkbox"]:checked + div {
+            border-color: var(--color-darker);
+            background-color: rgba(93, 114, 111, 0.1);
+        }
+        
+        input[type="checkbox"]:checked + div .option-indicator {
+            background-color: var(--color-darker);
+            color: white;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
             overflow: hidden;
         }
-        .question-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px -10px rgba(79, 70, 229, 0.3);
-        }
-        .checkbox-container input[type="checkbox"]:checked + label {
-            background-color: #4F46E5;
-            color: white;
-            border-color: #4F46E5;
-        }
-        .progress-bar {
-            transition: width 0.5s ease-in-out;
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: var(--color-darker);
+            transition: width 0.5s ease;
         }
     </style>
 </head>
 <body class="py-8 px-4">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <header class="text-center mb-12">
-            <div class="flex justify-center mb-6">
-                <div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white shadow-lg">
+    <div class="container mx-auto max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- En-tête -->
+        <div class="p-8 text-center" style="background-color: #5D726F;">
+            <div class="flex justify-center mb-4">
+                <div class="header-icon w-20 h-20 rounded-full flex items-center justify-center">
                     <i class="fas fa-graduation-cap text-4xl"></i>
                 </div>
             </div>
-            <h1 class="text-4xl font-bold text-primary mb-3">Questionnaire à Choix Multiples</h1>
-            <p class="text-gray-600 text-lg">Testez vos connaissances avec notre QCM interactif</p>
+            <h1 class="text-4xl font-bold text-white mb-2">QCM Département</h1>
+            <p class="text-white opacity-90">Testez vos connaissances avec notre QCM interactif</p>
             
-            <!-- Progress bar -->
-            <div class="mt-8 bg-gray-200 rounded-full h-3 w-3/4 mx-auto shadow-inner">
-                <div class="progress-bar h-3 rounded-full bg-gradient-to-r from-primary to-secondary" style="width: 30%"></div>
+            <!-- Barre de progression -->
+            <div class="mt-6 w-full bg-white bg-opacity-20 rounded-full h-2.5">
+                <div class="progress-bar bg-white h-2.5 rounded-full transition-all duration-500" id="progress-bar" style="width: 0%"></div>
             </div>
-        </header>
+            <p class="text-white text-sm mt-2"><span id="progress-text">0</span>% complété</p>
+        </div>
 
         <!-- QCM Form -->
-        <form action="/submit-qcm" method="post" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+        <form action="/EnregistrerReponse" method="post" class="p-8">
             <?php
             $questions = [];
             foreach ($QCMmodel as $row) {
@@ -84,36 +116,40 @@
             $question_count = 1;
             foreach ($questions as $question_id => $question_data) {
                 ?>
-                <div class="question-card card bg-base-100 border border-gray-100 mb-8 rounded-2xl overflow-hidden">
-                    <div class="card-body p-6">
+                <div class="question-card card bg-base-100 shadow-md mb-6">
+                    <div class="card-body">
                         <div class="flex items-start">
-                            <div class="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center text-primary mr-4 mt-1">
-                                <span class="font-bold"><?php echo $question_count; ?></span>
+                            <div class="mr-4 mt-1 flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white" style="background-color: #859393;">
+                                    <span class="font-bold"><?php echo $question_count; ?></span>
+                                </div>
                             </div>
-                            <div class="flex-1">
-                                <h2 class="card-title text-xl text-gray-800 mb-4">
-                                    <i class="fas fa-question-circle text-secondary mr-2"></i>
+                            <div class="flex-grow">
+                                <h2 class="card-title text-xl mb-4" style="color: #5D726F;">
                                     <?php echo htmlspecialchars($question_data['question_text']); ?>
                                 </h2>
                                 
-                                <div class="space-y-3 mt-5">
+                                <div class="options grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <?php foreach ($question_data['options'] as $index => $option) { 
-                                        $option_letter = chr(65 + $index); // A, B, C, etc.
+                                        $option_letter = chr(65 + $index);
                                     ?>
-                                    <div class="checkbox-container">
+                                    <label class="option-card cursor-pointer">
                                         <input type="checkbox" 
                                                name="reponses[<?php echo $question_id; ?>][]" 
                                                value="<?php echo htmlspecialchars($option['option_label']); ?>"
                                                id="q_<?php echo $question_id; ?>_<?php echo htmlspecialchars($option['option_label']); ?>"
-                                               class="hidden">
-                                        <label for="q_<?php echo $question_id; ?>_<?php echo htmlspecialchars($option['option_label']); ?>" 
-                                               class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-primary/5">
-                                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold mr-4">
-                                                <?php echo $option_letter; ?>
-                                            </span>
-                                            <span class="text-gray-700"><?php echo htmlspecialchars($option['option_text']); ?></span>
-                                        </label>
-                                    </div>
+                                               class="hidden peer">
+                                        <div class="card bg-base-100 border-2 border-gray-200 h-full">
+                                            <div class="card-body py-4">
+                                                <div class="flex items-center">
+                                                    <div class="option-indicator mr-3 w-8 h-8 rounded-full flex items-center justify-center bg-gray-100">
+                                                        <span class="font-bold"><?php echo $option_letter; ?></span>
+                                                    </div>
+                                                    <span class="text-gray-700"><?php echo htmlspecialchars($option['option_text']); ?></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -126,41 +162,53 @@
             ?>
             
             <!-- Submit button -->
-            <div class="mt-10 text-center">
-                <button type="submit" class="btn btn-primary btn-lg rounded-full px-10 shadow-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
+            <div class="text-center">
+                <button type="submit" class="btn btn-lg text-white border-0 px-8 py-3 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105" style="background-color: #5D726F;">
                     <i class="fas fa-paper-plane mr-2"></i> Soumettre le QCM
                 </button>
             </div>
         </form>
-        
-        <!-- Footer -->
-        <footer class="text-center mt-12 text-gray-500 text-sm">
-            <p>© 2023 QCM Département. Tous droits réservés.</p>
-        </footer>
     </div>
 
     <script>
+        // Mettre à jour la barre de progression
+        function updateProgress() {
+            const totalQuestions = document.querySelectorAll('.question-card').length;
+            let answered = 0;
+            
+            document.querySelectorAll('.question-card').forEach(question => {
+                const selectedOption = question.querySelector('input:checked');
+                if (selectedOption) {
+                    answered++;
+                }
+            });
+            
+            const percentage = Math.round((answered / totalQuestions) * 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = percentage;
+        }
+        
+        // Écouter les changements sur les inputs checkbox
+        document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', updateProgress);
+        });
+        
         // Animation pour les cases à cocher
-        document.querySelectorAll('.checkbox-container label').forEach(label => {
-            label.addEventListener('click', function() {
-                const checkbox = document.getElementById(this.htmlFor);
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                const indicator = this.querySelector('.option-indicator');
+                
                 if (checkbox.checked) {
-                    this.querySelector('span:first-child').classList.add('bg-primary', 'text-white');
-                    this.classList.add('border-primary', 'bg-primary/10');
+                    indicator.classList.add('bg-darker', 'text-white');
                 } else {
-                    this.querySelector('span:first-child').classList.remove('bg-primary', 'text-white');
-                    this.classList.remove('border-primary', 'bg-primary/10');
+                    indicator.classList.remove('bg-darker', 'text-white');
                 }
             });
         });
-
-        // Animation de la barre de progression au défilement
-        window.addEventListener('scroll', function() {
-            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrollPercentage = (scrollTop / scrollHeight) * 100;
-            document.querySelector('.progress-bar').style.width = Math.min(30 + scrollPercentage * 0.7, 100) + '%';
-        });
+        
+        // Initialiser la barre de progression
+        document.addEventListener('DOMContentLoaded', updateProgress);
     </script>
 </body>
 </html>

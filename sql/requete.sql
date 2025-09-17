@@ -19,7 +19,27 @@ WHERE d.id = 2
 ORDER BY qcm.id, qs.id, qo.option_label;
 
 
-
+SELECT 
+            d.id AS departement_id,
+            d.name AS departement_name,
+            qcm.id AS qcm_id,
+            qcm.title AS qcm_title,
+            qs.id AS question_id,
+            qs.question_text,
+            qs.points,
+            qo.id AS option_id,
+            qo.option_label,
+            qo.option_text,
+            qo.is_correct
+        FROM candidates c
+        JOIN users u ON c.id = u.id
+        JOIN departement d ON u.idDepartement = d.id
+        JOIN employees e ON e.id = u.id
+        JOIN qcms qcm ON qcm.departementProprietaire = e.id
+        JOIN questions qs ON qs.qcm_id = qcm.id
+        JOIN question_options qo ON qo.question_id = qs.id
+        WHERE c.id = 3
+        ORDER BY qcm.id, qs.id, qo.option_label;
 
 SELECT 
     c.id AS candidat_id,

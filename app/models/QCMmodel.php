@@ -11,8 +11,18 @@ class QCMmodel {
     public function __construct($db) {
         $this->db = $db;
     }
-
-
+    public function FindDepartement($idUser){
+        try{
+            $sql = "SELECT idDepartement FROM users WHERE id = '$idUser';";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC); 
+        }catch(Exception $e){
+            echo "Error: " . $e->getMessage();
+            return [];
+        }
+    }   
+    
     public function GetQCMDepartement($departementCorrespondant) {
     try {
         $sql = "SELECT 
@@ -44,24 +54,68 @@ class QCMmodel {
         return [];
     }
 }
-    public function ReponseCandidat($reponseCandidat){
-        try{
-            $sql = "";
-        }catch(Exception $e){
-
+  public function ReponsesCandidatBatch($reponses) {
+    try {
+        $this->db->beginTransaction();
+        
+        foreach ($reponses as $reponse) {
+            $idCandidat = 3; // Utilisez la valeur du tableau
+            $questionId = (int)$reponse['question_id'];
+            $optionId = (int)$reponse['option_id'];
+            
+            // Vérifier si cette réponse spécifique existe déjà
+            $checkSql = "SELECT id FROM qcm_answers 
+                         WHERE idCandidat = :idCandidat 
+                         AND question_id = :questionId
+                         AND option_id = :optionId";
+            
+            $stmt = $this->db->prepare($checkSql);
+            $stmt->execute([
+                ':idCandidat' => $idCandidat,
+                ':questionId' => $questionId,
+                ':optionId' => $optionId
+            ]);
+            
+            if ($stmt->fetch()) {
+                // La réponse existe déjà, on peut skip ou update si nécessaire
+                continue;
+            } else {
+                // Insérer la nouvelle réponse
+                $sql = "INSERT INTO qcm_answers (idCandidat, question_id, option_id) 
+                        VALUES (:idCandidat, :questionId, :optionId)";
+                
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    ':idCandidat' => $idCandidat,
+                    ':questionId' => $questionId,
+                    ':optionId' => $optionId
+                ]);
+            }
         }
+        
+        $this->db->commit();
+        
+        return [
+            'success' => true, 
+            'message' => count($reponses) . ' réponses enregistrées avec succès'
+        ];
+        
+    } catch(Exception $e) {
+        $this->db->rollBack();
+        error_log("Erreur lors de l'enregistrement des réponses: " . $e->getMessage());
+        return [
+            'success' => false, 
+            'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()
+        ];
     }
-    public function VerifierReponse($reponseQuestion){
-        try{
-            $sql = "SELECT ";
-        }catch(Exception $e){
+}
+}
 
-        }
-    }
+
   
 
 
 
-    }
+    
 
 ?>
