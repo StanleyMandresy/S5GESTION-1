@@ -69,3 +69,12 @@ CREATE TABLE qcm_answers (
     FOREIGN KEY (option_id) REFERENCES question_options(id) ON DELETE CASCADE
 );
 
+
+CREATE TABLE correct_answer(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idQuestion INT,
+    option_id INT,
+    FOREIGN KEY (idQuestion) REFERENCES questions(id) ON DELETE CASCADE,
+    FOREIGN KEY (option_id) REFERENCES question_id(id)
+);
+

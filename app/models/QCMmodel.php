@@ -41,12 +41,9 @@ class QCMmodel {
         JOIN questions qs ON qs.qcm_id = qcm.id
         JOIN question_options qo ON qo.question_id = qs.id
         WHERE d.id = '$departementCorrespondant'
-        ORDER BY qcm.id, qs.id, qo.option_label;";  
+        ORDER BY qcm.id, qs.id, qo.option_label; ";  
         $stmt = $this->db->prepare($sql);
        $stmt->execute();
-        
-  
-        
         return $stmt->fetchAll(PDO::FETCH_ASSOC); 
 
     } catch (Exception $e) {
@@ -109,6 +106,17 @@ class QCMmodel {
         ];
     }
 }
+    public function MikotyPointCandidat($idCandidat, $reponses): int {
+        try {
+            $sql="COUNT(*)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+
+   
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
 }
 
 

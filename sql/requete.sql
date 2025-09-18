@@ -56,7 +56,7 @@ JOIN candidates c ON qa.idCandidat = c.id
 JOIN users u ON c.id = u.id
 JOIN questions q ON qa.question_id = q.id
 JOIN qcms qcm ON q.qcm_id = qcm.id
-WHERE c.id = 1 -- ⚠️ ici, tu mets l'ID du candidat
+WHERE c.id = 3 
 GROUP BY c.id, candidat_nom, qcm.title;
 
 

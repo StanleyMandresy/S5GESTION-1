@@ -13,7 +13,7 @@ class QCMcontroller{
     public function accueil() {
 
 		$QCMmodel=new QCMmodel(Flight::db());
-		$QCMmodel = $QCMmodel->GetQCMDepartement(1);
+		$QCMmodel = $QCMmodel->GetQCMDepartement(2);
 
 
     // Ajout pour le débogage :
