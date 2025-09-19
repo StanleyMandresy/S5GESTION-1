@@ -67,3 +67,7 @@ SET option_a = 'Chaque débit a un crédit',
     option_d = 'Aucune des réponses',
     correct_answer = 'A'
 WHERE id = 2;
+SELECT qa.*, qo.* 
+FROM qcm_answers qa
+LEFT JOIN question_options qo ON qa.option_id = qo.id AND qa.question_id = qo.question_id
+WHERE qa.idCandidat = 3;

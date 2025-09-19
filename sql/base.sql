@@ -56,6 +56,7 @@ CREATE TABLE question_options (
     option_label CHAR(1),       
     option_text VARCHAR(255),   
     is_correct BOOLEAN DEFAULT 0,
+    points INT DEFAULT 0,
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 );
 
@@ -70,11 +71,10 @@ CREATE TABLE qcm_answers (
 );
 
 
-CREATE TABLE correct_answer(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    idQuestion INT,
-    option_id INT,
-    FOREIGN KEY (idQuestion) REFERENCES questions(id) ON DELETE CASCADE,
-    FOREIGN KEY (option_id) REFERENCES question_id(id)
-);
 
+CREATE TABLE scoreTotalCandidat(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idCandidat INT,
+    totalPoints INT,
+    FOREIGN KEY (idCandidat) REFERENCES candidates(id)
+);

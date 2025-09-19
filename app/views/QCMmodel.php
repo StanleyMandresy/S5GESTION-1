@@ -136,8 +136,8 @@
                                     <label class="option-card cursor-pointer">
                                         <input type="checkbox" 
                                                name="reponses[<?php echo $question_id; ?>][]" 
-                                               value="<?php echo htmlspecialchars($option['option_label']); ?>"
-                                               id="q_<?php echo $question_id; ?>_<?php echo htmlspecialchars($option['option_label']); ?>"
+                                               value="<?php echo htmlspecialchars($option['option_id']); ?>"
+                                               id="q_<?php echo $question_id; ?>_<?php echo htmlspecialchars($option['option_id']); ?>"
                                                class="hidden peer">
                                         <div class="card bg-base-100 border-2 border-gray-200 h-full">
                                             <div class="card-body py-4">

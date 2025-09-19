@@ -53,17 +53,17 @@ INSERT INTO questions (id, qcm_id, question_text, points, statusQCM) VALUES
 -- Question Options (Finance)
 -- Question 1 : plusieurs bonnes réponses
 -- ================================
-INSERT INTO question_options (id, question_id, option_label, option_text, is_correct) VALUES
-(1, 1, 'A', 'Bilan', 1),
-(2, 1, 'B', 'Compte de résultat', 1),
-(3, 1, 'C', 'Plan marketing', 0),
-(4, 1, 'D', 'Tableau de flux de trésorerie', 1),
+INSERT INTO question_options (id, question_id, option_label, option_text, is_correct,points) VALUES
+(1, 1, 'A', 'Bilan', 1,1),
+(2, 1, 'B', 'Compte de résultat', 1,1),
+(3, 1, 'C', 'Plan marketing', 0,0),
+(4, 1, 'D', 'Tableau de flux de trésorerie', 1,1),
 
 -- Question 2 : une seule bonne réponse
-(5, 2, 'A', 'Produits - Charges', 1),
-(6, 2, 'B', 'Actif - Passif', 0),
-(7, 2, 'C', 'Recettes - TVA', 0),
-(8, 2, 'D', 'Stocks - Amortissements', 0);
+(5, 2, 'A', 'Produits - Charges', 1,1),
+(6, 2, 'B', 'Actif - Passif', 0,0),
+(7, 2, 'C', 'Recettes - TVA', 0,0),
+(8, 2, 'D', 'Stocks - Amortissements', 0,0);
 
 -- ================================
 -- Questions (Marketing)
@@ -76,18 +76,18 @@ INSERT INTO questions (id, qcm_id, question_text, points, statusQCM) VALUES
 -- Question Options (Marketing)
 -- Question 3 : plusieurs bonnes réponses
 -- ================================
-INSERT INTO question_options (id, question_id, option_label, option_text, is_correct) VALUES
-(9, 3, 'A', 'Produit', 1),
-(10, 3, 'B', 'Prix', 1),
-(11, 3, 'C', 'Publicité', 0),
-(12, 3, 'D', 'Place (Distribution)', 1),
-(13, 3, 'E', 'Promotion', 1),
+INSERT INTO question_options (id, question_id, option_label, option_text, is_correct,points) VALUES
+(9, 3, 'A', 'Produit', 1,1),
+(10, 3, 'B', 'Prix', 1,1),
+(11, 3, 'C', 'Publicité', 0,0),
+(12, 3, 'D', 'Place (Distribution)',1, 1),
+(13, 3, 'E', 'Promotion',1, 1),
 
 -- Question 4 : une seule bonne réponse
-(14, 4, 'A', 'Taux de conversion', 0),
-(15, 4, 'B', 'Parts de marché', 0),
-(16, 4, 'C', 'Taux de notoriété spontanée', 1),
-(17, 4, 'D', 'Taux de clics', 0);
+(14, 4, 'A', 'Taux de conversion',0,0),
+(15, 4, 'B', 'Parts de marché',0,0),
+(16, 4, 'C', 'Taux de notoriété spontanée',1, 1),
+(17, 4, 'D', 'Taux de clics', 0,0);
 
 -- -- ================================
 -- -- Réponses des candidats
@@ -103,3 +103,20 @@ INSERT INTO question_options (id, question_id, option_label, option_text, is_cor
 -- (5, 4, 3, 11), -- a choisi Publicité (incorrect)
 -- (6, 4, 3, 13), -- a choisi Promotion (correct)
 -- (7, 4, 4, 16); -- a choisi Taux de notoriété spontanée (correct)
+-- INSERT INTO correct_answer (idQuestion, option_id) VALUES
+-- -- Question 1
+-- (1, 1),
+-- (1, 2),
+-- (1, 4),
+
+-- -- Question 2
+-- (2, 5),
+
+-- -- Question 3
+-- (3, 9),
+-- (3, 10),
+-- (3, 12),
+-- (3, 13),
+
+-- -- Question 4
+-- (4, 16);
