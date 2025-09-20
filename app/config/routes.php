@@ -6,15 +6,24 @@ use app\controllers\EntretienController;
 use flight\Engine;
 use flight\net\Router;
 
+use app\controllers\QCMcontroller;
+
+
 /** 
  * @var Router $router 
  * @var Engine $app
  */
-/*$router->get('/', function() use ($app) {
-	$Welcome_Controller = new WelcomeController($app);
-	$app->render('welcome', [ 'message' => 'It works!!' ]);
+// $router->get('/', function() use ($app) {
+// 	$Welcome_Controller = new WelcomeController($app);
+// 	$app->render('welcome', [ 'message' => 'It works!!' ]);
 
-});*/
+// });
+
+$QCMcontroller = new QCMcontroller();
+$router->get('/qcm', [$QCMcontroller, 'accueil']);
+$router->post('/EnregistrerReponse',[$QCMcontroller,'getReponsesCandidat']);
+$router->get('/showResults', [$QCMcontroller, 'showResults']);
+$router->get('/MessageDeConfirmation',[$QCMcontroller,'MessageDeConfirmation']);
 
 $NotificationController = new NotificationController();
 $router->get('/Notification', [$NotificationController, 'getAllCandidats']); 
