@@ -2,6 +2,7 @@
 use flight\Engine;
 use flight\net\Router;
 use app\controllers\QCMcontroller;
+use app\controllers\ContractController;
 //use Flight;
 
 /** 
@@ -20,7 +21,11 @@ $router->post('/EnregistrerReponse',[$QCMcontroller,'getReponsesCandidat']);
 $router->get('/showResults', [$QCMcontroller, 'showResults']);
 $router->get('/MessageDeConfirmation',[$QCMcontroller,'MessageDeConfirmation']);
 
-
+$ContractController = new ContractController();
+$router->get('/ContractSaisie',[$ContractController,'ContractSaisie']);
+// Sauvegarder contrat
+$router->post('/contracts/store', [$ContractController, 'ContractStore']);
+$router->get('/contract/show/@idCandidat', [$ContractController, 'showContract']);
 $router->get('/hello-world/@name', function($name) {
 	echo '<h1>Hello world! Oh hey '.$name.'!</h1>';
 });

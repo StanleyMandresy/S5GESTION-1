@@ -120,3 +120,53 @@ INSERT INTO question_options (id, question_id, option_label, option_text, is_cor
 
 -- -- Question 4
 -- (4, 16);
+
+
+
+INSERT INTO societe (id, name, address, phone, email, NumSiret)
+VALUES 
+(1, 'TechnoSoft SARL', '12 Rue des Entrepreneurs, Paris', '+33 1 45 67 89 10', 'contact@technosoft.com', '12345678900017');
+
+INSERT INTO contract_types (id, type_name)
+VALUES
+(1, 'CDI'),
+(2, 'CDD'),
+(3, 'Essai'),
+(4, 'Stage');
+INSERT INTO contract_statut (id, status_name)
+VALUES
+(1, 'En cours'),
+(2, 'Terminé'),
+(3, 'Résilié');
+INSERT INTO contracts (
+    id, idCandidat, idEmploye, contract_type, start_date, end_date, 
+    probation_duration, probation_renewable, remuneration, remuneration_hourly, 
+    work_hours_per_week, idStatut, idType
+) VALUES (
+    1, 3, NULL, 'Essai', '2025-09-01', '2025-11-30',
+    3, 1, 2000.00, 13.15,
+    35, 1, 3
+);
+INSERT INTO missions (id, idContract, description)
+VALUES
+(1, 1, 'Assurer le support technique aux clients et participer aux développements internes.'),
+(2, 1, 'Collaborer avec équipe projet pour tester et documenter les nouvelles fonctionnalités.');
+INSERT INTO contract_clauses (id, clause_title, clause_text)
+VALUES
+(1, 'Confidentialité', 'Le salarié s engage à garder strictement confidentielles toutes les informations relatives à l entreprise.'),
+(2, 'Non-concurrence', 'Le salarié ne peut pas exercer une activité concurrente durant la période du contrat.'),
+(3, 'Durée de travail', 'La durée hebdomadaire de travail est fixée à 35 heures.'),
+(4, 'Résiliation', 'Le contrat peut être rompu par l une ou l autre des parties avec un préavis de 7 jours pendant la période d essai.');
+
+INSERT INTO contract_clause_assignments (id, idContract, idClause)
+VALUES
+(1, 1, 1),
+(2, 1, 2),
+(3, 1, 3),
+(4, 1, 4);
+CREATE TABLE candidates_recus (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idCandidat INT,
+    dateRecus TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (idCandidat) REFERENCES candidates(id)
+);
