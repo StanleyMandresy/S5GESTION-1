@@ -1,8 +1,13 @@
 <?php
+use app\controllers\NotificationController;
+use app\controllers\EntretienController;
+
+
 use flight\Engine;
 use flight\net\Router;
+
 use app\controllers\QCMcontroller;
-//use Flight;
+
 
 /** 
  * @var Router $router 
@@ -19,6 +24,20 @@ $router->get('/qcm', [$QCMcontroller, 'accueil']);
 $router->post('/EnregistrerReponse',[$QCMcontroller,'getReponsesCandidat']);
 $router->get('/showResults', [$QCMcontroller, 'showResults']);
 $router->get('/MessageDeConfirmation',[$QCMcontroller,'MessageDeConfirmation']);
+
+$NotificationController = new NotificationController();
+$router->get('/Notification', [$NotificationController, 'getAllCandidats']); 
+$router->post('/Notification', [$NotificationController, 'sendNotification']); 
+
+Flight::route('/entretien/calendrier', function() {
+    Flight::render('CalendrierEntretien'); // page x.php
+});
+
+ $EntretienController = new EntretienController();
+ $router->get('/entretien/getEntretiens', [$EntretienController, 'getEntretiens']); 
+$router->get('/entretien/formulaire', [$EntretienController, 'EntretienForm']); 
+$router->post('/entretien/create', [$EntretienController, 'createEntretien']); 
+$router->post('/entretien/update', [$EntretienController, 'updateEntretien']);
 
 
 $router->get('/hello-world/@name', function($name) {
