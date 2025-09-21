@@ -75,7 +75,7 @@ class JobOfferController {
             $diploma_id, $level, $experience_year, $benefits, $is_active
         );
 
-        header("Location: /offers");
+        header("Location: /dashboard/employee");
         exit;
     }
 
@@ -159,7 +159,7 @@ class JobOfferController {
             $result = $jobOfferModel->setApproved($id, $status);
 
             if ($result > 0) {
-                header("Location: /offers?validation=success");
+                header("Location: /dashboard/employee");
             } else {
                 header("Location: /offers?validation=error");
             }

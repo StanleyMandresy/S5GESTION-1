@@ -42,6 +42,35 @@ class CandidateCv {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+        public function trierCVs($jobOfferId) {
+
+
+            // 2. Récupérer les 10 meilleurs candidats pour cette offre
+            $stmt = $this->db->prepare("
+            SELECT ccd.candidate_id
+            FROM candidate_cv_data ccd
+            WHERE ccd.job_offer_id = ?
+            ORDER BY ccd.experience_year DESC, ccd.level DESC
+            LIMIT 10
+            ");
+            $stmt->execute([$jobOfferId]);
+            $winners = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // 3. Mettre à jour leur stade à 2 (retenus)
+            if (!empty($winners)) {
+                $in  = str_repeat('?,', count($winners) - 1) . '?';
+                $sql = "UPDATE candidat_avance
+                SET stade = 2
+                WHERE job_offer_id = ? AND idcandidat IN ($in)";
+                $stmt = $this->db->prepare($sql);
+                $params = array_merge([$jobOfferId], $winners);
+                $stmt->execute($params);
+            }
+
+
+        }
+
+
     // Récupérer un CV par ID
     public function getById($id) {
         $sql = "SELECT * FROM candidate_cv_data WHERE id = :id";

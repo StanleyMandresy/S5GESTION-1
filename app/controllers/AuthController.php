@@ -4,6 +4,8 @@ session_start();
 use Flight;
 use app\models\User;
 
+use app\models\Department;
+
 class AuthController {
 
 
@@ -14,10 +16,18 @@ class AuthController {
     public function loginPage() {
         Flight::render('login', []);
     }
-
     public function registerPage() {
-        Flight::render('register', []);
+        $departmentModel = new Department(Flight::db());
+
+        // Récupération de tous les départements
+        $departments = $departmentModel->getAll();
+
+        // Envoi à la vue register
+        Flight::render('register', [
+            'departments' => $departments
+        ]);
     }
+
 
     public function login() {
       $userModel = new User(Flight::db());

@@ -11,7 +11,7 @@
 <!-- Planning -->
 <section class="card shadow-sm p-4 mb-6 rounded-4 animate__animated animate__fadeInUp">
 <h2 class="text-primary mb-3">
-<i class="bi bi-briefcase-fill me-2"></i> Offres d'emploi disponibles
+<i class="bi bi-briefcase-fill me-2"></i> Offres d'emploi du departement
 </h2>
 
 <?php if (!empty($jobOffers)): ?>
@@ -70,6 +70,17 @@
 <p>Aucune offre disponible pour le moment.</p>
 <?php endif; ?>
 </section>
+
+<?php if ($Rh!=false): ?>
+<p>
+<a href="/offers/validate" class="back-btn">← Valider demandes d'offres</a>
+</p>
+<?php endif; ?>
+
+
+<p>
+<a href="/offers/create" class="back-btn">← envoyer demandes d'offres</a>
+</p>
 
 
 <!-- Retour connexion -->

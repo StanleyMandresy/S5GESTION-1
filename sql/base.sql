@@ -89,6 +89,14 @@ CREATE TABLE candidate_cv_data (
     FOREIGN KEY (diploma_id) REFERENCES diploma(id) ON DELETE SET NULL
 );
 
+CREATE TABLE candidat_avance (
+    idcandidat INT NOT NULL,
+    job_offer_id INT NOT NULL,
+    stade TINYINT NOT NULL DEFAULT 1,
+    PRIMARY KEY (idcandidat),
+    FOREIGN KEY (job_offer_id) REFERENCES job_offers(id) ON DELETE CASCADE,
+    FOREIGN KEY (idcandidat) REFERENCES candidates(id)
+);
 
 CREATE TABLE qcms (
     id INT PRIMARY KEY AUTO_INCREMENT,

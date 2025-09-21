@@ -471,34 +471,32 @@
 <i class="fas fa-download"></i>
 </a>
 </div>
-<h2 class="cv-name"><?= htmlspecialchars($cv['Nom'] . " " . $cv['Prenom']) ?></h2>
+<h2 class="cv-name"><?= htmlspecialchars($cv['Nom'] ?? '' . ' ' . $cv['Prenom'] ?? '') ?></h2>
 <p class="cv-title"><?= htmlspecialchars($cv['diploma_name'] ?? 'N/A') ?></p>
-</div>
 
-<div class="cv-body">
 <div class="cv-detail">
 <span class="cv-detail-label"><i class="fas fa-envelope"></i> Email:</span>
-<span><?= htmlspecialchars($cv['Mail']) ?></span>
+<span><?= htmlspecialchars($cv['Mail'] ?? '') ?></span>
 </div>
 
 <div class="cv-detail">
 <span class="cv-detail-label"><i class="fas fa-phone"></i> Téléphone:</span>
-<span><?= htmlspecialchars($cv['phone']) ?></span>
+<span><?= htmlspecialchars($cv['phone'] ?? '') ?></span>
 </div>
 
 <div class="cv-detail">
 <span class="cv-detail-label"><i class="fas fa-map-marker-alt"></i> Adresse:</span>
-<span><?= htmlspecialchars($cv['address']) ?></span>
+<span><?= htmlspecialchars($cv['address'] ?? '') ?></span>
 </div>
 
 <div class="cv-detail">
 <span class="cv-detail-label"><i class="fas fa-chart-line"></i> Expérience:</span>
-<span><?= htmlspecialchars($cv['experience_year']) ?> ans</span>
+<span><?= htmlspecialchars($cv['experience_year'] ?? '') ?> ans</span>
 </div>
 
 <div class="cv-detail">
 <span class="cv-detail-label"><i class="fas fa-euro-sign"></i> Salaire souhaité:</span>
-<span><?= htmlspecialchars($cv['salaire_souhaite']) ?> €</span>
+<span><?= htmlspecialchars($cv['salaire_souhaite'] ?? '') ?> €</span>
 </div>
 
 <div class="cv-detail">
@@ -511,16 +509,17 @@
 <?php endforeach; ?>
 </div>
 </div>
-</div>
 
 <div class="cv-footer">
 <span class="cv-date">
 <i class="far fa-calendar-alt"></i>
-Déposé le: <?= htmlspecialchars($cv['date_depot']) ?>
+Déposé le: <?= htmlspecialchars($cv['date_depot'] ?? '') ?>
 </span>
-<a href="/cv/view?id=<?= $cv['cv_id'] ?>" class="btn btn-view">
+<a href="/cv/view?id=<?= htmlspecialchars($cv['cv_id'] ?? 0) ?>" class="btn btn-view">
 <i class="fas fa-eye"></i> Voir
 </a>
+</div>
+
 </div>
 </div>
 <?php endforeach; ?>

@@ -45,7 +45,7 @@ class User {
                 'Mail'    => $data['email']   // ✅ Obligatoire pour UNIQUE NOT NULL
             ]);
         } elseif ($data['role'] === 'employee') {
-            $departmentId = $data['department_id'] ?? 1;
+            $departmentId = $data['idDepartement'] ?? 1;
             $this->db->prepare("
             INSERT INTO employees (id, department_id, position)
             VALUES (:id, :department_id, :position)
