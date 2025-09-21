@@ -175,6 +175,6 @@ CREATE TABLE Entretien (
 );
 
 
-insert into candidat(Nom,Prenom,Mail) VALUES
-('stan','stanley','mandresystanley@gmail.com');
+insert into candidates(Nom,Prenom,Mail) VALUES
+('Ophelia','Cindy','cindyophelia2301@gmail.com');
 
