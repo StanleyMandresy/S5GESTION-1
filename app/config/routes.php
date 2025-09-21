@@ -83,10 +83,12 @@ $router->get('/cv/job/@id', [$candidateCv_Controller, 'CV']);              // vo
 $router->get('/cv/view', [$candidateCv_Controller, 'view']);              // voir un CV
 $router->get('/cv/edit', [$candidateCv_Controller, 'editForm']);          // modifier CV
 $router->post('/cv/update', [$candidateCv_Controller, 'update']);        //
-$router->get('/cv/delete', [$candidateCv_Controller, 'destroy']);        // supprimer CV
+$router->get('/cv/delete', [$candidateCv_Controller, 'destroy']);
+$router->post('/cv/trier', [$candidateCv_Controller, 'trier']);
+
 
 $QCMcontroller = new QCMcontroller();
-$router->get('/qcm', [$QCMcontroller, 'accueil']);
+$router->get('/qcm/@id', [$QCMcontroller, 'accueil']);
 $router->post('/EnregistrerReponse',[$QCMcontroller,'getReponsesCandidat']);
 $router->get('/showResults', [$QCMcontroller, 'showResults']);
 $router->get('/MessageDeConfirmation',[$QCMcontroller,'MessageDeConfirmation']);

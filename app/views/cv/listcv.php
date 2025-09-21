@@ -291,6 +291,12 @@
     </style>
 </head>
 <body>
+<?php if (!empty($_SESSION['success_message'])): ?>
+<div class="alert alert-success">
+<?= htmlspecialchars($_SESSION['success_message']) ?>
+</div>
+<?php unset($_SESSION['success_message']); ?>
+<?php endif; ?>
     <?php include __DIR__ . '/header.php'; ?>
     <!-- Élément de décoration feuille -->
     <div class="leaf-decoration" style="top: 10%; right: 5%; transform: rotate(25deg);">
@@ -470,6 +476,15 @@
             <?php endif; ?>
         </div>
     </div>
+    <div class="text-end mb-3">
+    <form action="/cv/trier" method="POST">
+    <input type="hidden" name="job_offer_id" value="<?= htmlspecialchars($job_offer_id) ?>">
+    <button type="submit" class="btn btn-primary">
+    <i class="fas fa-sort-amount-down"></i> Trier les CVs
+    </button>
+    </form>
+    </div>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

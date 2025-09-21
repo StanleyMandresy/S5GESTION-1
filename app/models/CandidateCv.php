@@ -2,6 +2,8 @@
 namespace app\models;
 use PDO;
 use Exception;
+use Flight;
+use app\models\Notification;
 
 class CandidateCv {
     private $db;
@@ -42,33 +44,76 @@ class CandidateCv {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-        public function trierCVs($jobOfferId) {
+  public function trierCVs($jobOfferId) {
+      try {
+          $notification = new Notification(Flight::db());
 
+          // 0. Initialiser les candidats (si pas déjà en avance)
+          $sql = "
+          INSERT INTO candidat_avance (idcandidat, job_offer_id, stade)
+          SELECT ccd.candidate_id, ccd.job_offer_id, 1
+          FROM candidate_cv_data ccd
+          WHERE ccd.job_offer_id = ?
+          AND NOT EXISTS (
+              SELECT 1 FROM candidat_avance ca
+              WHERE ca.idcandidat = ccd.candidate_id
+              AND ca.job_offer_id = ccd.job_offer_id
+              )
+              ";
+              $stmt = $this->db->prepare($sql);
+              $stmt->execute([$jobOfferId]);
 
-            // 2. Récupérer les 10 meilleurs candidats pour cette offre
-            $stmt = $this->db->prepare("
-            SELECT ccd.candidate_id
-            FROM candidate_cv_data ccd
-            WHERE ccd.job_offer_id = ?
-            ORDER BY ccd.experience_year DESC, ccd.level DESC
-            LIMIT 10
-            ");
-            $stmt->execute([$jobOfferId]);
-            $winners = $stmt->fetchAll(PDO::FETCH_COLUMN);
+              // 1. Réinitialiser tous les candidats de l'offre à stade = 0 (rejet)
+              $sql = "UPDATE candidat_avance
+              SET stade = 0
+              WHERE job_offer_id = ?";
+              $stmt = $this->db->prepare($sql);
+              $stmt->execute([$jobOfferId]);
 
-            // 3. Mettre à jour leur stade à 2 (retenus)
-            if (!empty($winners)) {
-                $in  = str_repeat('?,', count($winners) - 1) . '?';
-                $sql = "UPDATE candidat_avance
-                SET stade = 2
-                WHERE job_offer_id = ? AND idcandidat IN ($in)";
-                $stmt = $this->db->prepare($sql);
-                $params = array_merge([$jobOfferId], $winners);
-                $stmt->execute($params);
-            }
+              // 2. Récupérer les 10 meilleurs candidats pour cette offre
+              $stmt = $this->db->prepare("
+              SELECT ccd.candidate_id
+              FROM candidate_cv_data ccd
+              WHERE ccd.job_offer_id = ?
+              ORDER BY ccd.experience_year DESC, ccd.level DESC
+              LIMIT 10
+              ");
+              $stmt->execute([$jobOfferId]);
+              $winners = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+              // 3. Mettre à jour leur stade à 2 (retenus)
+              if (!empty($winners)) {
+                  $in  = str_repeat('?,', count($winners) - 1) . '?';
+                  $sql = "UPDATE candidat_avance
+                  SET stade = 2
+                  WHERE job_offer_id = ? AND idcandidat IN ($in)";
+                  $stmt = $this->db->prepare($sql);
+                  $params = array_merge([$jobOfferId], $winners);
+                  $stmt->execute($params);
 
-        }
+                  // 4. Notifications gagnants
+                  foreach ($winners as $idCandidat) {
+                      $notification->sendNotification($idCandidat, "acceptation");
+                  }
+
+                  // 5. Notifications perdants
+                  $stmt = $this->db->prepare("
+                  SELECT idcandidat
+                  FROM candidat_avance
+                  WHERE job_offer_id = ? AND stade = 0
+                  ");
+                  $stmt->execute([$jobOfferId]);
+                  $losers = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                  foreach ($losers as $idCandidat) {
+                      $notification->sendNotification($idCandidat, "rejet");
+                  }
+              }
+
+      } catch (Exception $e) {
+          error_log("Erreur tri des CVs : " . $e->getMessage());
+      }
+  }
 
 
     // Récupérer un CV par ID

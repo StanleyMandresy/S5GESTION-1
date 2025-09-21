@@ -14,28 +14,27 @@ class CandidateController {
     }
 
     // Dashboard principal du candidat
-    public function dashboard() {
-        $candidateModel = new Candidat(Flight::db());
-        $jobOfferModel = new JobOffer(Flight::db());
-        $userId = $_SESSION['user']['id'];
 
-        $profile       = $candidateModel->getProfile($userId);
-        $jobOffers     = $jobOfferModel->getJobOffers();
-        $applications  = 0;
-        $assignedQCMs  = 0;
-        $interviews    = 0;
+  public function dashboard() {
+      $candidateModel = new Candidat(Flight::db());
+      $jobOfferModel  = new JobOffer(Flight::db());
+      $userId         = $_SESSION['user']['id'];
 
+      $profile   = $candidateModel->getProfile($userId);
+      $jobOffers = $jobOfferModel->getJobOffers();
 
-        Flight::render('dashboard_candidate', [
-            'profile'       => $profile,
+      // Vérifier si le candidat a postulé à chaque offre et récupérer le stade
+      foreach ($jobOffers as &$offer) {
+          $offer['applied'] = $candidateModel->hasApplied($profile['id'], $offer['id']);
+          $offer['stade']   = $candidateModel->getStadeCandidat($profile['id'], $offer['id']);
+      }
+      unset($offer); // bonne pratique après référence
 
-            'jobOffers'     => $jobOffers,
-            'applications'  => $applications,
-            'assignedQCMs'  => $assignedQCMs,
-            'interviews'    => $interviews,
-
-        ]);
-    }
-
+      Flight::render('dashboard_candidate', [
+          'profile'   => $profile,
+          'jobOffers' => $jobOffers,
+      ]);
+  }
 
 }
+

@@ -14,7 +14,7 @@ class JobOffer {
     // Récupérer toutes les offres actives
     public function getJobOffers() {
         try {
-            $sql = "SELECT j.*, d.name AS department_name
+            $sql = "SELECT j.*, d.name AS department_name,d.id as departement_id
             FROM job_offers j
             JOIN departement d ON j.department_id = d.id
             WHERE j.is_approved=TRUE

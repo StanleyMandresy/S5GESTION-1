@@ -38,7 +38,7 @@ class Notification {
      */
   public function sendNotification($idCandidat, $type) {
         // Récupération email candidat
-        $sql = "SELECT Mail FROM Candidat WHERE id = :id";
+        $sql = "SELECT Mail FROM candidates WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $idCandidat]);
         $candidat = $stmt->fetch(PDO::FETCH_ASSOC);
