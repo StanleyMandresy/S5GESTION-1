@@ -70,7 +70,7 @@ INSERT INTO question_options (id, question_id, option_label, option_text, is_cor
 -- ================================
 INSERT INTO questions (id, qcm_id, question_text, points, statusQCM) VALUES
 (3, 2, 'Quels sont les 4P du marketing ?', 5, 1),
-(4, 2, 'Quel indicateur mesure la notoriété d’une marque ?', 5, 1);
+(4, 2, 'Quel indicateur mesure la notoriété d une marque ?', 5, 1);
 
 -- ================================
 -- Question Options (Marketing)
@@ -120,3 +120,27 @@ INSERT INTO question_options (id, question_id, option_label, option_text, is_cor
 
 -- -- Question 4
 -- (4, 16);
+INSERT INTO job_offers
+(department_id, title, description, locations, deadline, diploma_id, benefits, is_active, experience_level)
+VALUES
+-- Offre Informatique
+(1, 'Développeur Full-Stack',
+ 'Nous recherchons un développeur Full-Stack pour concevoir, développer et maintenir des applications web modernes.',
+ 'Paris', '2025-12-31', 1,
+ 'Tickets restaurant, télétravail partiel, mutuelle santé',
+ TRUE, '2-3 ans d expérience');
+
+-- Offre Ressources Humaines
+(2, 'Chargé de Recrutement',
+ 'Responsable du processus de recrutement, de la rédaction des offres à l’intégration des candidats.',
+ 'Lyon', '2025-11-30', 2,
+ 'Formation continue, primes sur objectifs, RTT',
+ TRUE, 'Débutant à intermédiaire'),
+
+(3, 'Consultant Marketing Digital',
+ 'Développement de stratégies digitales innovantes pour accroître la visibilité et la notoriété de nos clients.',
+ 'Marseille', '2025-10-31', 3,
+ 'Participation à des conférences, voyages d"affaires, primes de performance',
+ TRUE, '5 ans et plus');
+
+

@@ -25,12 +25,11 @@ class Candidat {
         $stmt = $this->db->prepare("
         SELECT u.*, c.phone, c.address, c.resume_path
         FROM users u
-        JOIN candidates c ON u.id = c.user_id
-        WHERE u.id = :id
+        JOIN candidates c ON u.id=c.id
+        WHERE u.id=:id
         ");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
 
 }

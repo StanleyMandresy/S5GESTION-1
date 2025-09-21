@@ -1,0 +1,83 @@
+<?php
+namespace app\models;
+
+use PDO;
+
+class Employee {
+    private $db;
+
+    public function __construct(PDO $db) {
+        $this->db = $db;
+    }
+
+    // Récupérer le profil complet de l'employé
+    public function getProfile(int $id): array|false {
+        $stmt = $this->db->prepare("
+            SELECT u.id, u.first_name, u.last_name, u.email, e.department, e.position
+            FROM users u
+            JOIN employees e ON u.id = e.id
+            WHERE u.id = :id
+        ");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Récupérer toutes les missions assignées à l'employé
+    public function getMissions(int $id): array {
+        $stmt = $this->db->prepare("
+            SELECT *
+            FROM employee_tasks
+            WHERE employee_id = :id
+            ORDER BY start_date DESC
+        ");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Récupérer le planning / agenda de l'employé
+    public function getSchedule(int $id): array {
+        $stmt = $this->db->prepare("
+            SELECT *
+            FROM employee_schedule
+            WHERE employee_id = :id
+            ORDER BY event_date, start_time
+        ");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Récupérer tous les documents de l'employé
+    public function getDocuments(int $id): array {
+        $stmt = $this->db->prepare("
+            SELECT *
+            FROM employee_documents
+            WHERE employee_id = :id
+            ORDER BY uploaded_at DESC
+        ");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Récupérer toutes les notifications de l'employé
+    public function getNotifications(int $id): array {
+        $stmt = $this->db->prepare("
+            SELECT *
+            FROM notifications
+            WHERE user_id = :id
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Marquer une notification comme lue
+    public function markNotificationRead(int $notificationId): bool {
+        $stmt = $this->db->prepare("
+            UPDATE notifications
+            SET is_read = TRUE
+            WHERE id = :id
+        ");
+        return $stmt->execute(['id' => $notificationId]);
+    }
+}
+?php>
