@@ -140,6 +140,100 @@
             font-size: 120px;
             color: var(--color-dark);
         }
+        
+        /* Styles pour l'upload d'image */
+        .image-upload-container {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .image-upload-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-dark);
+        }
+        
+        .image-upload-box {
+            border: 2px dashed var(--color-medium);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            position: relative;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .image-upload-box:hover {
+            border-color: var(--color-dark);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .image-upload-box.dragover {
+            border-color: var(--color-dark);
+            background-color: rgba(93, 114, 111, 0.1);
+        }
+        
+        .image-upload-icon {
+            font-size: 2rem;
+            color: var(--color-dark-medium);
+            margin-bottom: 10px;
+        }
+        
+        .image-upload-text {
+            color: var(--color-dark);
+            margin-bottom: 5px;
+        }
+        
+        .image-upload-hint {
+            color: var(--color-dark-medium);
+            font-size: 0.85rem;
+        }
+        
+        .image-upload-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .image-preview-container {
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .remove-image-btn {
+            margin-top: 10px;
+            background-color: #f87171;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .remove-image-btn:hover {
+            background-color: #ef4444;
+        }
     </style>
 </head>
 <body class="min-h-screen py-5 landscape-bg">
@@ -167,10 +261,36 @@
             
             <!-- Formulaire -->
             <div class="form-container p-6 md:p-8 relative">
-                <form method="POST" action="/cv/submit" id="cv-form">
+                <form method="POST" action="/cv/submit" id="cv-form" enctype="multipart/form-data">
                     <?php if (isset($_POST['job_offer_id'])): ?>
                     <input type="hidden" name="job_offer_id" value="<?= htmlspecialchars($_POST['job_offer_id']) ?>">
                     <?php endif; ?>
+                    
+                    <!-- Section Photo améliorée -->
+                    <div class="mb-6">
+                        <h3 class="section-title text-2xl font-semibold">
+                            <i class="fas fa-user me-2"></i>Photo de profil
+                        </h3>
+                        
+                        <div class="image-upload-container">
+                            <label class="image-upload-label">Photo (optionnel)</label>
+                            <div class="image-upload-box" id="image-upload-box">
+                                <div class="image-upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="image-upload-text">Glissez-déposez votre photo ici ou cliquez pour parcourir</div>
+                                <div class="image-upload-hint">Formats acceptés: JPG, PNG - Taille max: 2MB</div>
+                                <input type="file" name="photo" id="photo" accept="image/jpeg, image/png" class="image-upload-input">
+                            </div>
+                            
+                            <div class="image-preview-container" id="image-preview-container">
+                                <img src="" class="image-preview" id="image-preview" alt="Aperçu de la photo">
+                                <button type="button" class="remove-image-btn" id="remove-image-btn">
+                                    <i class="fas fa-times me-1"></i>Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="mb-6">
                         <h3 class="section-title text-2xl font-semibold">
@@ -293,6 +413,77 @@
                 input.addEventListener('blur', function() {
                     this.parentElement.classList.remove('ring-2', 'ring-offset-2', 'ring-opacity-50', 'ring-[#5D726F]');
                 });
+            });
+            
+            // Gestion de l'upload d'image
+            const imageUploadBox = document.getElementById('image-upload-box');
+            const photoInput = document.getElementById('photo');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const imagePreview = document.getElementById('image-preview');
+            const removeImageBtn = document.getElementById('remove-image-btn');
+            
+            // Drag and drop
+            imageUploadBox.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            imageUploadBox.addEventListener('dragleave', function() {
+                this.classList.remove('dragover');
+            });
+            
+            imageUploadBox.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length) {
+                    photoInput.files = e.dataTransfer.files;
+                    handleImageSelection(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // Sélection via le bouton parcourir
+            photoInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    handleImageSelection(this.files[0]);
+                }
+            });
+            
+            // Afficher l'aperçu de l'image
+            function handleImageSelection(file) {
+                // Vérification du type de fichier
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Veuillez sélectionner une image au format JPG ou PNG.');
+                    return;
+                }
+                
+                // Vérification de la taille (2MB max)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('L\'image ne doit pas dépasser 2MB.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                    imageUploadBox.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+                
+                // Mettre à jour la barre de progression
+                updateProgressBar();
+            }
+            
+            // Supprimer l'image sélectionnée
+            removeImageBtn.addEventListener('click', function() {
+                photoInput.value = '';
+                imagePreviewContainer.style.display = 'none';
+                imageUploadBox.style.display = 'flex';
+                
+                // Mettre à jour la barre de progression
+                updateProgressBar();
             });
         });
     </script>

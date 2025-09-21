@@ -71,3 +71,6 @@ SELECT qa.*, qo.*
 FROM qcm_answers qa
 LEFT JOIN question_options qo ON qa.option_id = qo.id AND qa.question_id = qo.question_id
 WHERE qa.idCandidat = 3;
+
+
+ALTER TABLE candidate_cv_data ADD COLUMN photo_path VARCHAR(255); 

@@ -84,6 +84,7 @@ $router->get('/cv/view', [$candidateCv_Controller, 'view']);              // voi
 $router->get('/cv/edit', [$candidateCv_Controller, 'editForm']);          // modifier CV
 $router->post('/cv/update', [$candidateCv_Controller, 'update']);        //
 $router->get('/cv/delete', [$candidateCv_Controller, 'destroy']);        // supprimer CV
+$router->get('/cv/exportpdf', [$candidateCv_Controller, 'exportPdf']); // export PDF CV
 
 $QCMcontroller = new QCMcontroller();
 $router->get('/qcm', [$QCMcontroller, 'accueil']);
