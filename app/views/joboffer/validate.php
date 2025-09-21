@@ -370,7 +370,7 @@
                 <a href="#" class="text-2xl text-light hover:text-light-alt transition"><i class="bi bi-instagram"></i></a>
                 <a href="#" class="text-2xl text-light hover:text-light-alt transition"><i class="bi bi-linkedin"></i></a>
             </div>
-            <p>© 2023 Paysagistes Experts. Tous droits réservés.</p>
+            <p>© 2025 Paysagistes Experts. Tous droits réservés.</p>
         </div>
     </footer>
 

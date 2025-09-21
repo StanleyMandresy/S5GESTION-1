@@ -12,9 +12,8 @@ class CandidateCv {
     public function insertCv(
         $candidate_id, $job_offer_id,
         $date_depot, $diploma_id, $level, $experience_year,
-        $languages, $avantages, $atout, $salaire_souhaite
+        $languages, $avantages, $atout, $salaire_souhaite, $photo_path = null
     ) {
-
 
         $stmt = $this->db->prepare("SELECT id FROM candidates WHERE user_id = ?");
         $stmt->execute([ $candidate_id]);
@@ -23,14 +22,14 @@ class CandidateCv {
         $sql = "INSERT INTO candidate_cv_data (
             candidate_id, job_offer_id, date_depot,
             diploma_id, level, experience_year,
-            languages, avantages, atout, salaire_souhaite
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            languages, avantages, atout, salaire_souhaite, photo_path
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             $candidate_id, $job_offer_id, $date_depot,
             $diploma_id, $level, $experience_year,
-            $languages, $avantages, $atout, $salaire_souhaite
+            $languages, $avantages, $atout, $salaire_souhaite, $photo_path
         ]);
     }
 
@@ -71,11 +70,20 @@ class CandidateCv {
         }
 
 
-    // Récupérer un CV par ID
+    // Récupérer un CV par ID avec infos candidat et diplôme
     public function getById($id) {
-        $sql = "SELECT * FROM candidate_cv_data WHERE id = :id";
+        $sql = "
+            SELECT
+                cv.*, 
+                c.Nom, c.Prenom, c.Mail, c.phone, c.address, c.resume_path,
+                d.name AS diploma_name
+            FROM candidate_cv_data cv
+            JOIN candidates c ON cv.candidate_id = c.id
+            LEFT JOIN diploma d ON cv.diploma_id = d.id
+            WHERE cv.id = :id
+        ";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([":id" => $id]);
+        $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
