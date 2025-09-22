@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Entretien;
 use app\models\Candidat;
+use app\models\Notification;
 use Flight;
 
 class EntretienController{
@@ -44,7 +45,7 @@ class EntretienController{
      
     }
 public function createEntretien() {
-    // Récupérer les données POST classiques
+    // Récupérer les données POST
     $idCandidat = $_POST['idCandidat'] ?? null;
     $date_heure_debut = $_POST['date_heure_debut'] ?? null;
 
@@ -52,17 +53,23 @@ public function createEntretien() {
         echo "<p style='color:red;'>Candidat ou date manquante</p>";
         return;
     }
-  $entretienModel = new Entretien(Flight::db());
-    // Appeler PlanifierEntretien
-    $result = $entretienModel->PlanifierEntretien($idCandidat, $date_heure_debut);
+
+    $entretienModel = new Entretien(Flight::db());
+    $planification = $entretienModel->PlanifierEntretien($idCandidat, $date_heure_debut);
+
+    $notification = new Notification(Flight::db());
+    $notificationSent = $notification->sendNotification($idCandidat, "entretien", $date_heure_debut);
 
     // Afficher un message
-    if ($result['success']) {
-        echo "<p style='color:green;'>{$result['message']}</p>";
+    if ($planification && $notificationSent) {
+        echo "<p style='color:green;'>Entretien planifié et notification envoyée avec succès.</p>";
+    } elseif ($planification) {
+        echo "<p style='color:orange;'>Entretien planifié mais la notification a échoué.</p>";
     } else {
-        echo "<p style='color:red;'>{$result['message']}</p>";
+        echo "<p style='color:red;'>Erreur lors de la planification de l'entretien.</p>";
     }
 }
+
 public function updateEntretien() {
     // Récupérer le JSON envoyé par fetch()
     $data = json_decode(file_get_contents("php://input"), true);

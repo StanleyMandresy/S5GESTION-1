@@ -25,18 +25,21 @@ class Notification {
      * @param string $type "acceptation" ou "rejet"
      * @return string
      */
-    public static function message($type) {
-        if (strtolower($type) === "acceptation") {
-            return "Félicitations 🎉, vous passez à l'étape suivante de la sélection !";
-        } else {
-            return "Malheureusement 😔, votre candidature n’a pas été retenue cette fois.";
-        }
+    public static function message(string $type) {
+    if (strtolower($type) === "acceptation") {
+        return "Félicitations 🎉, vous passez à l'étape suivante de la sélection !";
+    } else if (strtolower($type) === "entretien") {
+        return "Votre entretien sera le ";
+    } else {
+        return "Malheureusement 😔, votre candidature n’a pas été retenue cette fois.";
     }
+}
+
 
     /**
      * Envoie une notification et l'enregistre en base
      */
-  public function sendNotification($idCandidat, $type) {
+  public function sendNotification($idCandidat, $type,?string $date = null) {
         // Récupération email candidat
         $sql = "SELECT Mail FROM candidates WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -64,7 +67,12 @@ class Notification {
 
     $mail->isHTML(true);
     $mail->Subject = "Notification sur le recrutement";
-    $mail->Body    = $message;
+    if(strtolower($type) === "entretien"){
+    $mail->Body    = $message.$date;
+    }else{
+       $mail->Body    = $message; 
+    }
+    
     $mail->SMTPOptions = [
         'ssl' => [
             'verify_peer' => false,
