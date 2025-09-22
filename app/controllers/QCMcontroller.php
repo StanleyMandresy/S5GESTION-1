@@ -28,11 +28,12 @@ class QCMcontroller{
     }
 
     public function getReponsesCandidat() {
+        
     $candidateModel = new Candidat(Flight::db());
  
-      $userId         = $_SESSION['user']['id'];
+      $userId= $_SESSION['user']['id'];
 
-      $profile   = $candidateModel->getProfile($userId);
+      $profile= $candidateModel->getProfile($userId);
 
         $idCandidat = $profile['id']; //$_SESSION['idCandidat'] ??
         $reponsesData = $_POST['reponses'] ?? [];

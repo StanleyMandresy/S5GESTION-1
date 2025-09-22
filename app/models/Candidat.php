@@ -17,7 +17,7 @@ class Candidat {
      * @return array
      */
     public function findAllCandidats() {
-        $sql = "SELECT * FROM Candidat";
+        $sql = "SELECT * FROM candidates";
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

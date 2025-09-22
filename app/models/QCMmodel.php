@@ -102,77 +102,71 @@ public function MikotyPointCandidatFromDB($idCandidat){
     }
 }
 public function ReponsesCandidatBatch($reponses) {
-    try {
-        $this->db->beginTransaction();
-        $count = 0;
-        
-        foreach ($reponses as $reponse) {
-            // Validation simple
-            if (!isset($reponse['idCandidat']) || !isset($reponse['question_id']) || !isset($reponse['option_id'])) {
-                error_log("Données manquantes: " . print_r($reponse, true));
-                continue;
+        try {
+            $this->db->beginTransaction();
+            $count = 0;
+            $idCandidat = null;
+            foreach ($reponses as $reponse) {
+                // Validation simple
+                if (!isset($reponse['idCandidat']) || !isset($reponse['question_id']) || !isset($reponse['option_id'])) {
+                    error_log("Données manquantes: " . print_r($reponse, true));
+                    continue;
+                }
+                $idCandidat = (int)$reponse['idCandidat'];
+                $questionId = (int)$reponse['question_id'];
+                $optionId = (int)$reponse['option_id'];
+                // Vérifier l'existence
+                $checkSql = "SELECT id FROM qcm_answers 
+                             WHERE idCandidat = :idCandidat 
+                             AND question_id = :questionId
+                             AND option_id = :optionId";
+                $stmt = $this->db->prepare($checkSql);
+                $stmt->execute([
+                    ':idCandidat' => $idCandidat,
+                    ':questionId' => $questionId,
+                    ':optionId' => $optionId
+                ]);
+                if ($stmt->fetch()) {
+                    continue; // Existe déjà
+                }
+                // Insertion
+                $sql = "INSERT INTO qcm_answers (idCandidat, question_id, option_id) 
+                        VALUES (:idCandidat, :questionId, :optionId)";
+                $stmt = $this->db->prepare($sql);
+                $success = $stmt->execute([
+                    ':idCandidat' => $idCandidat,
+                    ':questionId' => $questionId,
+                    ':optionId' => $optionId
+                ]);
+                if ($success) {
+                    $count++;
+                }
             }
-            
-            $idCandidat = (int)$reponse['idCandidat'];
-            $questionId = (int)$reponse['question_id'];
-            $optionId = (int)$reponse['option_id'];
-            
-            // Vérifier l'existence
-            $checkSql = "SELECT id FROM qcm_answers 
-                         WHERE idCandidat = :idCandidat 
-                         AND question_id = :questionId
-                         AND option_id = :optionId";
-            
-            $stmt = $this->db->prepare($checkSql);
-            $stmt->execute([
-                ':idCandidat' => $idCandidat,
-                ':questionId' => $questionId,
-                ':optionId' => $optionId
-            ]);
-            
-            if ($stmt->fetch()) {
-                continue; // Existe déjà
+            $this->db->commit();
+            // Calculer et enregistrer le score du candidat après l'insertion des réponses
+            if ($idCandidat !== null) {
+                $this->MikotyPointCandidatFromDB($idCandidat);
             }
-            
-            // Insertion
-            $sql = "INSERT INTO qcm_answers (idCandidat, question_id, option_id) 
-                    VALUES (:idCandidat, :questionId, :optionId)";
-            
-            $stmt = $this->db->prepare($sql);
-            $success = $stmt->execute([
-                ':idCandidat' => $idCandidat,
-                ':questionId' => $questionId,
-                ':optionId' => $optionId
-            ]);
-            
-            if ($success) {
-                $count++;
-            }
+            return [
+                'success' => true, 
+                'message' => "$count réponses enregistrées avec succès",
+                'count' => $count
+            ];
+        } catch(Exception $e) {
+            $this->db->rollBack();
+            error_log("Erreur lors de l'enregistrement: " . $e->getMessage());
+            return [
+                'success' => false, 
+                'message' => 'Erreur: ' . $e->getMessage()
+            ];
         }
-        
-        $this->db->commit();
-        
-        return [
-            'success' => true, 
-            'message' => "$count réponses enregistrées avec succès",
-            'count' => $count
-        ];
-        
-    } catch(Exception $e) {
-        $this->db->rollBack();
-        error_log("Erreur lors de l'enregistrement: " . $e->getMessage());
-        return [
-            'success' => false, 
-            'message' => 'Erreur: ' . $e->getMessage()
-        ];
-    }
-}
-
+    
 }
 
 
   
-
+    
+}
 
 
     

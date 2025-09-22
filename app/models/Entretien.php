@@ -15,7 +15,7 @@ class Entretien {
 public function getEntretiens() {
     $sql = "SELECT e.id, c.Nom, e.Date_heure_debut, e.Date_heure_fin, e.Presence, e.Notes 
             FROM Entretien e 
-            JOIN Candidat c ON e.idCandidat = c.id";
+            JOIN candidates c ON e.idCandidat = c.id";
     $stmt = $this->db->query($sql);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

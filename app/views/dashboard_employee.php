@@ -306,6 +306,9 @@ if (session_status() === PHP_SESSION_NONE) {
             <a href="/offers/create" class="btn btn-primary-custom">
                 <i class="fas fa-paper-plane me-2"></i> Envoyer demandes d'offres
             </a>
+            <a href="/entretien/calendrier" class="btn btn-primary-custom">
+                <i class="fas fa-paper-plane me-2"></i> Planifier Entretien
+            </a>
             
             <a href="/login" class="back-btn">
                 <i class="fas fa-arrow-left me-2"></i> Retour vers Connexion
