@@ -1,9 +1,10 @@
 <?php
 
+
 namespace app\controllers;
 use app\models\QCMmodel;
-
 use Flight;
+use PDO;
 
 class QCMcontroller{
 
@@ -47,10 +48,13 @@ class QCMcontroller{
     }
 
     public function showResults() {
-    $idCandidat =  3;//$_SESSION['idCandidat'] ??
     $QCMmodel = new QCMmodel(Flight::db());
-    $score = $QCMmodel->MikotyPointCandidatFromDB($idCandidat);
-    Flight::render('qcm_results', ['score' => $score, 'idCandidat' => $idCandidat]);
+    // Récupérer tous les scores des candidats
+    $sql = "SELECT idCandidat, totalPoints FROM scoreTotalCandidat";
+    $stmt = Flight::db()->prepare($sql);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    Flight::render('qcm_results', ['results' => $results]);
     }
 
     

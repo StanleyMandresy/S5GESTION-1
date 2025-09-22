@@ -31,24 +31,5 @@ class Candidat {
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public function getStadeCandidat($idCandidat, $jobOfferId) {
-        try {
-            $sql = "SELECT stade
-            FROM candidat_avance
-            WHERE idcandidat = ? AND job_offer_id = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$idCandidat, $jobOfferId]);
-            $stade = $stmt->fetchColumn();
-
-            if ($stade === false) {
-                return null; // pas encore dans candidat_avance
-            }
-            return (int)$stade;
-
-        } catch (Exception $e) {
-            error_log("Erreur getStadeCandidat : " . $e->getMessage());
-            return null;
-        }
-    }
 
 }
