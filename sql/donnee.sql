@@ -39,7 +39,7 @@ INSERT INTO StatusQCM (id, typeStat) VALUES
 -- QCMs
 -- ================================
 INSERT INTO qcms (id, title, departementProprietaire) VALUES
-(1, 'QCM Finance - Comptabilité', 1),
+(1, 'QCM Finance - Comptabilité', 2),
 (2, 'QCM Marketing - Publicité', 2);
 
 -- ================================
