@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 use app\models\QCMmodel;
+use app\models\Candidat;
 
 use Flight;
 
@@ -26,7 +27,13 @@ class QCMcontroller{
     }
 
     public function getReponsesCandidat() {
-        $idCandidat = 3; //$_SESSION['idCandidat'] ??
+   $candidateModel = new Candidat(Flight::db());
+   
+      $userId         = $_SESSION['user']['id'];
+
+      $profile   = $candidateModel->getProfile($userId);
+
+        $idCandidat = $profile['id']; //$_SESSION['idCandidat'] ??
         $reponsesData = $_POST['reponses'] ?? [];
         $reponses = [];
         foreach ($reponsesData as $question_id => $options) {
@@ -40,6 +47,7 @@ class QCMcontroller{
         }
         $QCMmodel = new QCMmodel(Flight::db());
         $result = $QCMmodel->ReponsesCandidatBatch($reponses);
+        
         // Stocker les réponses en session pour calcul du score
         $_SESSION['reponses_candidat'] = $reponses;
         $_SESSION['idCandidat'] = $idCandidat;

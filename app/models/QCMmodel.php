@@ -122,6 +122,8 @@ public function ReponsesCandidatBatch($reponses) {
                          WHERE idCandidat = :idCandidat 
                          AND question_id = :questionId
                          AND option_id = :optionId";
+
+            
             
             $stmt = $this->db->prepare($checkSql);
             $stmt->execute([
@@ -129,6 +131,8 @@ public function ReponsesCandidatBatch($reponses) {
                 ':questionId' => $questionId,
                 ':optionId' => $optionId
             ]);
+
+      
             
             if ($stmt->fetch()) {
                 continue; // Existe déjà
