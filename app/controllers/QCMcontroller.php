@@ -10,10 +10,10 @@ class QCMcontroller{
 	public function __construct() {
 
 	}
-    public function accueil() {
+    public function accueil($departement_id) {
 
 		$QCMmodel=new QCMmodel(Flight::db());
-		$QCMmodel = $QCMmodel->GetQCMDepartement(2);//$_SESSION['idCandidat'] ??
+		$QCMmodel = $QCMmodel->GetQCMDepartement($departement_id);//$_SESSION['idCandidat'] ??
 
 
     // Ajout pour le débogage :

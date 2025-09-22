@@ -94,13 +94,22 @@
             </div>
 
             <div class="card-footer bg-transparent border-0 text-end">
-                <form action="/cv/form" method="POST" class="d-inline">
-                    <input type="hidden" name="job_offer_id" value="<?= $offer['id'] ?>">
-                    <button type="submit" class="btn btn-success btn-sm rounded-pill shadow-sm hover:scale-110 transition">
-                        <i class="bi bi-send-fill me-1"></i> Postuler
-                    </button>
-                </form>
+            <?php if ($offer['applied'] && $offer['stade'] != 2 ): ?>
+            <span class="text-success fw-bold">Vous avez déjà postulé</span>
+            <?php elseif ($offer['applied'] && $offer['stade'] === 2): ?>
+            <a href="/qcm/ <?= $offer['departement_id'] ?>" class="btn btn-primary">
+            Passer QCM
+            </a>
+            <?php else: ?>
+            <form action="/cv/form" method="POST" class="d-inline">
+            <input type="hidden" name="job_offer_id" value="<?= $offer['id'] ?>">
+            <button type="submit" class="btn btn-success btn-sm rounded-pill shadow-sm hover:scale-110 transition">
+            <i class="bi bi-send-fill me-1"></i> Postuler
+            </button>
+            </form>
+            <?php endif; ?>
             </div>
+
         </div>
         </div>
         <?php endforeach; ?>
