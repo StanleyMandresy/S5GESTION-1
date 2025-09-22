@@ -90,6 +90,16 @@ public function updateEntretien($id, $note, $remarques, $presence) {
     ]);
 }
 
+public function updateNotesRH($idEntretien, $noteRH) {
+    $sql = "UPDATE Entretien SET NotesRH = :noteRH WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([
+        ':noteRH' => $noteRH,
+        ':id' => $idEntretien
+    ]);
+}
+
+
 }
     
   

@@ -107,6 +107,22 @@ Flight::route('/entretien/calendrier', function() {
 $router->get('/entretien/formulaire', [$EntretienController, 'EntretienForm']); 
 $router->post('/entretien/create', [$EntretienController, 'createEntretien']); 
 $router->post('/entretien/update', [$EntretienController, 'updateEntretien']);
+$router->post('/entretien/updateNoteRH', function() {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $id = $data['id'] ?? null;
+    $note = $data['noteRH'] ?? null;
+
+    if ($id && $note !== null) {
+        $entretien = new Entretien(Flight::db());
+        $ok = $entretien->updateNotesRH($id, $note);
+        echo json_encode([
+            'success' => $ok,
+            'message' => $ok ? "Note mise à jour ✅" : "Erreur lors de la mise à jour ❌"
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Paramètres manquants']);
+    }
+});
 
 
 $router->get('/hello-world/@name', function($name) {

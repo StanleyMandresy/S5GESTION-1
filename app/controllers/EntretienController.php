@@ -36,7 +36,7 @@ class EntretienController{
   public function EntretienForm() {
 
 		$candidats =new Candidat(Flight::db());
-		$candidats = $candidats->findAllCandidats();
+		  $candidats = $candidats->findAllCandidatsStade3();
 
 
 		Flight::render('FormulaireEntretien', [
@@ -92,6 +92,14 @@ public function updateEntretien() {
     } else {
         echo json_encode(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
     }
+}
+public function ListeCandidatsStade3() {
+    $candidats = new Candidat(Flight::db());
+    $candidats = $candidats->findAllCandidatsStade3AvecEntretien();
+
+    Flight::render('ListeCandidatsStade3', [
+        'candidats' => $candidats
+    ]);
 }
 
    

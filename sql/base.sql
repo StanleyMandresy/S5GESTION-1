@@ -103,7 +103,7 @@ CREATE TABLE qcms (
     title VARCHAR(255) NOT NULL,
     departementProprietaire INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (departementProprietaire) REFERENCES employees(id)
+    FOREIGN KEY (departementProprietaire) REFERENCES employees(department_id)
 );
 
 CREATE TABLE StatusQCM(
@@ -168,7 +168,8 @@ CREATE TABLE Entretien (
     idCandidat INT,
     Date_heure_debut DATETIME,
     Date_heure_fin DATETIME,
-    Notes TEXT,
+    Notes INT,
+    NotesRH INT,
     Presence ENUM('presents','absents'),
     Remarques TEXT,
     FOREIGN KEY (idCandidat) REFERENCES candidates(id)

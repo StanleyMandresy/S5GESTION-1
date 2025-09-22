@@ -58,6 +58,29 @@ class Candidat {
         $stmt->execute([$candidateId, $jobOfferId]);
         return $stmt->fetchColumn() > 0;
     }
+    public function findAllCandidatsStade3() {
+        $sql = "
+        SELECT c.*
+        FROM candidates c
+        INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+        WHERE ca.stade = 3
+        ";
 
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function findAllCandidatsStade3AvecEntretien() {
+        $sql = "
+        SELECT c.*, e.id AS entretien_id, e.Date_heure_debut, e.NotesRH
+        FROM candidates c
+        INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+        INNER JOIN Entretien e ON e.idCandidat = c.id
+        WHERE ca.stade = 3
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 }
