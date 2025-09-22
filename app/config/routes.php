@@ -85,6 +85,7 @@ $router->get('/cv/edit', [$candidateCv_Controller, 'editForm']);          // mod
 $router->post('/cv/update', [$candidateCv_Controller, 'update']);        //
 $router->get('/cv/delete', [$candidateCv_Controller, 'destroy']);
 $router->post('/cv/trier', [$candidateCv_Controller, 'trier']);
+$router->get('/cv/exportpdf', [$candidateCv_Controller, 'exportPdf']); // export PDF CV
 
 
 $QCMcontroller = new QCMcontroller();
