@@ -3,6 +3,7 @@
 
 namespace app\controllers;
 use app\models\QCMmodel;
+use app\models\Candidat;
 use Flight;
 use PDO;
 
@@ -27,7 +28,13 @@ class QCMcontroller{
     }
 
     public function getReponsesCandidat() {
-        $idCandidat = 3; //$_SESSION['idCandidat'] ??
+    $candidateModel = new Candidat(Flight::db());
+ 
+      $userId         = $_SESSION['user']['id'];
+
+      $profile   = $candidateModel->getProfile($userId);
+
+        $idCandidat = $profile['id']; //$_SESSION['idCandidat'] ??
         $reponsesData = $_POST['reponses'] ?? [];
         $reponses = [];
         foreach ($reponsesData as $question_id => $options) {
