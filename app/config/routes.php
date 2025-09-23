@@ -107,6 +107,8 @@ Flight::route('/entretien/calendrier', function() {
 $router->get('/entretien/formulaire', [$EntretienController, 'EntretienForm']); 
 $router->post('/entretien/create', [$EntretienController, 'createEntretien']); 
 $router->post('/entretien/update', [$EntretienController, 'updateEntretien']);
+$router->get('/entretien/listeEntretien', [$EntretienController, 'ListeCandidatsStade3']);
+
 $router->post('/entretien/updateNoteRH', function() {
     $data = json_decode(file_get_contents("php://input"), true);
     $id = $data['id'] ?? null;

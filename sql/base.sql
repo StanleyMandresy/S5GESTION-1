@@ -169,11 +169,13 @@ CREATE TABLE Entretien (
     Date_heure_debut DATETIME,
     Date_heure_fin DATETIME,
     Notes INT,
-    NotesRH INT,
+
     Presence ENUM('presents','absents'),
     Remarques TEXT,
     FOREIGN KEY (idCandidat) REFERENCES candidates(id)
 );
+ALTER TABLE Entretien
+ADD NotesRH INT;
 
 
 insert into candidates(Nom,Prenom,Mail) VALUES
