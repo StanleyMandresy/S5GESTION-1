@@ -46,6 +46,8 @@ class EntretienController{
     }
 public function createEntretien() {
     // Récupérer les données POST
+    var_dump($_POST);
+
     $idCandidat = $_POST['idCandidat'] ?? null;
     $date_heure_debut = $_POST['date_heure_debut'] ?? null;
 

@@ -403,39 +403,39 @@
         </div>
     </footer>
 
-    <script>
+<!--    <script>
         // Script pour gérer l'affichage du message de succès
         document.getElementById('entretienForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             // Simulation d'envoi réussi
             const successMessage = document.getElementById('successMessage');
             successMessage.style.display = 'block';
-            
+
             // Réinitialiser le formulaire après 5 secondes
             setTimeout(() => {
                 successMessage.style.display = 'none';
             }, 5000);
         });
-        
+
         // Amélioration de l'expérience utilisateur pour la sélection de date
         const dateInput = document.getElementById('date_heure_debut');
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         dateInput.min = now.toISOString().slice(0, 16);
-        
+
         // Pré-remplir avec une date par défaut (demain à 10h)
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(10, 0, 0, 0);
         dateInput.value = tomorrow.toISOString().slice(0, 16);
-        
+
         // Animation des cartes au défilement
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
         };
-        
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -444,7 +444,7 @@
                 }
             });
         }, observerOptions);
-        
+
         // Appliquer l'animation aux cartes
         document.querySelectorAll('.card').forEach(card => {
             card.style.opacity = '0';
@@ -452,6 +452,6 @@
             card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             observer.observe(card);
         });
-    </script>
+    </script>-->
 </body>
 </html>
