@@ -21,28 +21,33 @@ class User {
     public function create(array $data): int {
         // 1️⃣ Créer l'utilisateur
         $stmt = $this->db->prepare("
-        INSERT INTO users (first_name, last_name, email, password, role)
-        VALUES (:first_name, :last_name, :email, :password, :role)
+        INSERT INTO users (first_name, last_name, email, password, role, phone, address)
+        VALUES (:first_name, :last_name, :email, :password, :role, :phone, :address)
         ");
         $stmt->execute([
             'first_name' => $data['first_name'],
             'last_name'  => $data['last_name'],
             'email'      => $data['email'],
             'password'   => password_hash($data['password'], PASSWORD_BCRYPT),
-                       'role'       => $data['role']
+                       'role'       => $data['role'],
+                       'phone'      => $data['phone'] ?? null,
+                       'address'    => $data['address'] ?? null
         ]);
+
         $userId = (int)$this->db->lastInsertId();
 
         // 2️⃣ Création du profil selon le rôle
         if ($data['role'] === 'candidate') {
             $this->db->prepare("
-            INSERT INTO candidates (user_id, Nom, Prenom, Mail)
-            VALUES (:user_id, :Nom, :Prenom, :Mail)
+            INSERT INTO candidates (user_id, Nom, Prenom, Mail, phone, address)
+            VALUES (:user_id, :Nom, :Prenom, :Mail, :phone, :address)
             ")->execute([
                 'user_id' => $userId,
                 'Nom'     => $data['first_name'] ?? '',
                 'Prenom'  => $data['last_name'] ?? '',
-                'Mail'    => $data['email']   // ✅ Obligatoire pour UNIQUE NOT NULL
+                'Mail'    => $data['email'], // ✅ UNIQUE NOT NULL
+                'phone'   => $data['phone'] ?? null,
+                'address' => $data['address'] ?? null
             ]);
         } elseif ($data['role'] === 'employee') {
             $departmentId = $data['idDepartement'] ?? 1;

@@ -337,6 +337,18 @@ if (session_status() === PHP_SESSION_NONE) {
                     <i class="fas fa-lock input-icon"></i>
                     <input type="password" name="password" class="form-control" placeholder="Mot de passe" required autocomplete="new-password">
                 </div>
+
+
+                <div class="form-group">
+                <i class="fas fa-phone input-icon"></i>
+                <input type="text" name="phone" class="form-control" placeholder="Téléphone">
+                </div>
+
+                <div class="form-group">
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                <textarea name="address" class="form-control" placeholder="Adresse"></textarea>
+                </div>
+
                 
                 <div class="form-group">
                     <select name="role" id="roleSelect" class="form-select" required>

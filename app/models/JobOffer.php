@@ -14,9 +14,10 @@ class JobOffer {
     // Récupérer toutes les offres actives
     public function getJobOffers() {
         try {
-            $sql = "SELECT j.*, d.name AS department_name,d.id as departement_id
+            $sql = "SELECT j.*, d.name AS department_name,d.id as departement_id,dp.name as dname
             FROM job_offers j
             JOIN departement d ON j.department_id = d.id
+            Join diploma dp on j.diploma_id=dp.id
             WHERE j.is_approved=TRUE
             ORDER BY j.deadline DESC";
             return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
@@ -55,7 +56,7 @@ class JobOffer {
     // Récupérer toutes les offres par département
     public function getByDepartment($department_id) {
         try {
-            $sql = "SELECT * FROM job_offers WHERE department_id = ? and is_approved=true ORDER BY deadline DESC";
+            $sql = "SELECT * FROM job_offers j Join diploma dp on j.diploma_id=dp.id WHERE department_id = ? and is_approved=true ORDER BY deadline DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$department_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

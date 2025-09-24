@@ -247,11 +247,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             </h5>
                         </div>
                         <div class="job-card-body">
-                            <div class="job-detail">
-                                <i class="fas fa-building"></i>
-                                <span><strong>Département :</strong> <?= htmlspecialchars($offer['department'] ?? '-') ?></span>
-                            </div>
-                            
+
                             <div class="job-detail">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <span><strong>Lieu :</strong> <?= htmlspecialchars($offer['locations'] ?? '-') ?></span>
@@ -259,12 +255,12 @@ if (session_status() === PHP_SESSION_NONE) {
                             
                             <div class="job-detail">
                                 <i class="fas fa-graduation-cap"></i>
-                                <span><strong>Diplôme requis :</strong> <?= htmlspecialchars($offer['diploma'] ?? '-') ?></span>
+                                <span><strong>Diplôme requis :</strong> <?= htmlspecialchars($offer['name'] ?? '-') ?></span>
                             </div>
                             
                             <div class="job-detail">
                                 <i class="fas fa-award"></i>
-                                <span><strong>Expérience :</strong> <?= htmlspecialchars($offer['experience_level'] ?? '-') ?></span>
+                                <span><strong>Expérience :</strong> <?= htmlspecialchars($offer['experience_year'] ?? '-') ?></span>
                             </div>
                             
                             <div class="job-detail">

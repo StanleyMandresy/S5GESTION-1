@@ -65,7 +65,7 @@
                 </h5>
                 <h6 class="card-subtitle text-muted mb-3">
                     <i class="bi bi-building me-2"></i>
-                    <?= htmlspecialchars($offer['department'] ?? '-') ?>
+                    <?= htmlspecialchars($offer['department_name'] ?? '-') ?>
                 </h6>
 
                 <p class="mb-2">
@@ -75,12 +75,12 @@
 
                 <p class="mb-2">
                     <i class="bi bi-mortarboard-fill me-2"></i>
-                    <strong>Diplôme requis :</strong> <?= htmlspecialchars($offer['diploma'] ?? '-') ?>
+                    <strong>Diplôme requis :</strong> <?= htmlspecialchars($offer['dname'] ?? '-') ?>
                 </p>
 
                 <p class="mb-2">
                     <i class="bi bi-award-fill me-2"></i>
-                    <strong>Expérience :</strong> <?= htmlspecialchars($offer['experience_level'] ?? '-') ?>
+                    <strong>Expérience(ans) :</strong> <?= htmlspecialchars($offer['experience_year'] ?? '-')  ?>
                 </p>
 
                 <p class="mb-2">

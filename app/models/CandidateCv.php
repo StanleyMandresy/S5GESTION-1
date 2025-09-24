@@ -197,6 +197,7 @@ class CandidateCv {
                 d.name AS diploma_name
                 FROM candidate_cv_data cv
                 JOIN candidates c ON cv.candidate_id = c.id
+
                 LEFT JOIN diploma d ON cv.diploma_id = d.id
                 WHERE cv.job_offer_id = :job_offer_id
                 ORDER BY cv.date_depot DESC
