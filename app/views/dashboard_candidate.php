@@ -94,12 +94,16 @@
             </div>
 
             <div class="card-footer bg-transparent border-0 text-end">
-            <?php if ($offer['applied'] && $offer['stade'] != 2 ): ?>
+            <?php if ($offer['applied'] && $offer['stade'] <= 1): ?>
             <span class="text-success fw-bold">Vous avez déjà postulé</span>
-            <?php elseif ($offer['applied'] && $offer['stade'] === 2): ?>
-            <a href="/qcm/ <?= $offer['departement_id'] ?>" class="btn btn-primary">
+            <?php elseif ($offer['applied'] && $offer['stade'] == 2): ?>
+            <a href="/qcm/<?= $offer['departement_id'] ?>" class="btn btn-primary">
             Passer QCM
             </a>
+            <?php elseif ($offer['applied'] && $offer['stade'] == 3): ?>
+            <span class="text-success fw-bold">Attente d'entretien</span>
+            <?php elseif ($offer['applied'] && $offer['stade'] == 0): ?>
+            <span class="text-danger fw-bold">Vous avez été rejeté</span>
             <?php else: ?>
             <form action="/cv/form" method="POST" class="d-inline">
             <input type="hidden" name="job_offer_id" value="<?= $offer['id'] ?>">
@@ -108,6 +112,7 @@
             </button>
             </form>
             <?php endif; ?>
+
             </div>
 
         </div>

@@ -59,48 +59,54 @@ ORDER BY qcm.id, qs.id, qo.option_label;
     }
 }
  
-public function MikotyPointCandidatFromDB($idCandidat){
-    try {
-        $totalPoints = 0;
-        $sql = "SELECT qa.question_id, qa.option_id, qo.is_correct, qo.points
-                FROM qcm_answers qa
-                JOIN question_options qo ON qa.option_id = qo.id AND qa.question_id = qo.question_id
-                WHERE qa.idCandidat = :idCandidat";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':idCandidat' => $idCandidat]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        foreach ($rows as $row) {
-            if ($row['is_correct']) {
-                $totalPoints += (int)$row['points'];
-            }
-        }
-        
-        // Vérifier si un score existe déjà
-        $checkSql = "SELECT id FROM scoreTotalCandidat WHERE idCandidat = :idCandidat";
-        $checkStmt = $this->db->prepare($checkSql);
-        $checkStmt->execute([':idCandidat' => $idCandidat]);
-        
-        if ($checkStmt->rowCount() > 0) {
-            // Mise à jour
-            $sqlScore = "UPDATE scoreTotalCandidat SET totalPoints = :totalPoints WHERE idCandidat = :idCandidat";
-        } else {
-            // Insertion
-            $sqlScore = "INSERT INTO scoreTotalCandidat (idCandidat, totalPoints) VALUES (:idCandidat, :totalPoints)";
-        }
-        
-        $stmtScore = $this->db->prepare($sqlScore);
-        $stmtScore->execute([
-            ':idCandidat' => $idCandidat,
-            ':totalPoints' => $totalPoints
-        ]);
-        
-        return $totalPoints;
-    } catch (\Throwable $th) {
-        error_log("Erreur dans MikotyPointCandidatFromDB: " . $th->getMessage());
-        return 0;
-    }
-}
+ public function MikotyPointCandidatFromDB($idCandidat){
+     try {
+         $totalPoints = 0;
+         $sql = "SELECT qa.question_id, qa.option_id, qo.is_correct, qo.points
+         FROM qcm_answers qa
+         JOIN question_options qo ON qa.option_id = qo.id AND qa.question_id = qo.question_id
+         WHERE qa.idCandidat = :idCandidat";
+         $stmt = $this->db->prepare($sql);
+         $stmt->execute([':idCandidat' => $idCandidat]);
+         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+         foreach ($rows as $row) {
+             if ($row['is_correct']) {
+                 $totalPoints += (int)$row['points'];
+             }
+         }
+
+         // Vérifier si un score existe déjà
+         $checkSql = "SELECT id FROM scoreTotalCandidat WHERE idCandidat = :idCandidat";
+         $checkStmt = $this->db->prepare($checkSql);
+         $checkStmt->execute([':idCandidat' => $idCandidat]);
+
+         if ($checkStmt->rowCount() > 0) {
+             // Mise à jour
+             $sqlScore = "UPDATE scoreTotalCandidat SET totalPoints = :totalPoints WHERE idCandidat = :idCandidat";
+         } else {
+             // Insertion
+             $sqlScore = "INSERT INTO scoreTotalCandidat (idCandidat, totalPoints) VALUES (:idCandidat, :totalPoints)";
+         }
+
+         $stmtScore = $this->db->prepare($sqlScore);
+         $stmtScore->execute([
+             ':idCandidat' => $idCandidat,
+             ':totalPoints' => $totalPoints
+         ]);
+
+         // 🚀 Avancer le candidat au stade 3
+         $sqlAvance = "UPDATE candidat_avance SET stade = 3 WHERE idCandidat = :idCandidat";
+         $stmtAvance = $this->db->prepare($sqlAvance);
+         $stmtAvance->execute([':idCandidat' => $idCandidat]);
+
+         return $totalPoints;
+     } catch (\Throwable $th) {
+         error_log("Erreur dans MikotyPointCandidatFromDB: " . $th->getMessage());
+         return 0;
+     }
+ }
+
 public function ReponsesCandidatBatch($reponses) {
         try {
             $this->db->beginTransaction();

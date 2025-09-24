@@ -266,15 +266,18 @@
                         
                         <!-- Date et heure -->
                         <div class="form-control">
-                            <label for="date_heure_debut" class="label">
-                                <span class="label-text font-semibold text-lg">
-                                    <i class="bi bi-clock mr-2 calendar-icon"></i>Date et heure de début :
-                                </span>
-                            </label>
-                            <input type="datetime-local" name="date_heure_debut" id="date_heure_debut" 
-                                   class="input input-bordered w-full form-input p-3 rounded-lg text-lg" required>
+                        <label for="date_heure_debut" class="label">
+                        <span class="label-text font-semibold text-lg">
+                        <i class="bi bi-clock mr-2 calendar-icon"></i>Date et heure de début :
+                        </span>
+                        </label>
+                        <input type="datetime-local"
+                        name="date_heure_debut"
+                        id="date_heure_debut"
+                        class="input input-bordered w-full form-input p-3 rounded-lg text-lg"
+                        required>
                         </div>
-                        
+
                         <!-- Durée de l'entretien -->
                         <div class="form-control">
                             <label for="duree" class="label">
