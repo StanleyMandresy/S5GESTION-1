@@ -56,7 +56,7 @@ class JobOffer {
     // Récupérer toutes les offres par département
     public function getByDepartment($department_id) {
         try {
-            $sql = "SELECT * FROM job_offers j Join diploma dp on j.diploma_id=dp.id WHERE department_id = ? and is_approved=true ORDER BY deadline DESC";
+            $sql = "SELECT j.*,dp.name FROM job_offers j Join diploma dp on j.diploma_id=dp.id WHERE department_id = ? and is_approved=true ORDER BY deadline DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$department_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

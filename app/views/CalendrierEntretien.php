@@ -381,7 +381,7 @@
                     const status = info.event.extendedProps.status || 'planned';
                     let statusBadge = document.createElement('span');
                     statusBadge.classList.add('event-status-badge');
-                    
+
                     if (status === 'completed') {
                         statusBadge.classList.add('status-completed');
                         statusBadge.textContent = 'Terminé';
@@ -392,7 +392,7 @@
                         statusBadge.classList.add('status-planned');
                         statusBadge.textContent = 'Planifié';
                     }
-                    
+
                     info.el.querySelector('.fc-event-title').appendChild(statusBadge);
                 },
                 select: function(info) {
@@ -403,7 +403,7 @@
                         month: 'long',
                         day: 'numeric'
                     });
-                    
+
                     // Afficher un modal au lieu d'une alerte simple
                     document.getElementById('interviewDate').value = date.substring(0, 16);
                     let modal = new bootstrap.Modal(document.getElementById('addInterviewModal'));
@@ -413,7 +413,11 @@
                     let id = info.event.id;
                     let title = info.event.title;
                     let start = info.event.start;
-                    
+
+                    if (info.event.extendedProps.presence === 'presents') {
+                        showNotification("Candidat déjà présent : modification interdite", "info");
+                        return;
+                    }
                     // Créer un modal personnalisé pour modifier l'entretien
                     let modalContent = `
                         <div class="mb-3">
@@ -442,7 +446,7 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // Utiliser SweetAlert2 pour un modal plus esthétique (à intégrer si disponible)
                     // Pour l'instant, nous utilisons l'approche native
                     let note = prompt("Note :", info.event.extendedProps.note || "");
@@ -453,11 +457,11 @@
                         fetch('/entretien/update', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ 
-                                id: id, 
-                                note: note, 
-                                remarques: remarque, 
-                                presence: presence 
+                            body: JSON.stringify({
+                                id: id,
+                                note: note,
+                                remarques: remarque,
+                                presence: presence
                             })
                         }).then(res => res.json())
                         .then(data => {
@@ -468,7 +472,7 @@
                 }
             });
             calendar.render();
-            
+
             // Fonction pour filtrer le calendrier
             window.filterCalendar = function(filter) {
                 if (filter === 'today') {
@@ -477,7 +481,7 @@
                     calendar.changeView('timeGridWeek');
                 }
             };
-            
+
             // Fonction pour exporter le calendrier
             window.exportCalendar = function() {
                 // Simuler l'exportation
@@ -486,25 +490,25 @@
                     showNotification('Calendrier exporté avec succès!', 'success');
                 }, 1500);
             };
-            
+
             // Fonction pour soumettre le formulaire d'entretien
             window.submitInterviewForm = function() {
                 const candidateName = document.getElementById('candidateName').value;
                 const interviewDate = document.getElementById('interviewDate').value;
                 const interviewType = document.getElementById('interviewType').value;
                 const interviewNotes = document.getElementById('interviewNotes').value;
-                
+
                 if (!candidateName || !interviewDate) {
                     showNotification('Veuillez remplir tous les champs obligatoires', 'error');
                     return;
                 }
-                
+
                 // Simuler l'envoi des données
                 fetch('/entretien/create', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        date_heure_debut: interviewDate, 
+                    body: JSON.stringify({
+                        date_heure_debut: interviewDate,
                         idCandidat: 1, // À remplacer par l'ID réel
                         candidateName: candidateName,
                         type: interviewType,
@@ -518,19 +522,19 @@
                     document.getElementById('interviewForm').reset();
                 });
             };
-            
+
             // Fonction pour afficher les notifications
             function showNotification(message, type) {
                 // Créer une notification toast personnalisée
                 const toast = document.createElement('div');
                 toast.classList.add('position-fixed', 'top-0', 'end-0', 'p-3');
                 toast.style.zIndex = '9999';
-                
+
                 let bgColor = 'bg-primary';
                 if (type === 'success') bgColor = 'bg-success';
                 if (type === 'error') bgColor = 'bg-danger';
                 if (type === 'info') bgColor = 'bg-info';
-                
+
                 toast.innerHTML = `
                     <div class="toast align-items-center text-white ${bgColor} border-0 show" role="alert">
                         <div class="d-flex">
@@ -539,9 +543,9 @@
                         </div>
                     </div>
                 `;
-                
+
                 document.body.appendChild(toast);
-                
+
                 // Supprimer la notification après 3 secondes
                 setTimeout(() => {
                     document.body.removeChild(toast);
