@@ -1,3 +1,5 @@
+
+<form action="/entretien/listeEntretien" method="POST">
 <table class="table">
 <thead>
 <tr>
@@ -15,29 +17,18 @@
 <td><?= htmlspecialchars($c['Prenom']) ?></td>
 <td><?= $c['Date_heure_debut'] ?></td>
 <td>
-<input type="number" id="note-<?= $c['entretien_id'] ?>"
-value="<?= $c['NotesRH'] ?? '' ?>" min="0" max="20">
+<input type="number"
+name="notes[<?= $c['entretien_id'] ?>]"
+value="<?= $c['NotesRH'] ?? '' ?>"
+min="0" max="20">
 </td>
 <td>
-<button onclick="saveNote(<?= $c['entretien_id'] ?>)">💾 Sauvegarder</button>
+<button type="submit" name="save" value="<?= $c['entretien_id'] ?>">
+💾 Sauvegarder
+</button>
 </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
-
-<script>
-function saveNote(entretienId) {
-    let note = document.getElementById("note-" + entretienId).value;
-
-    fetch('/entretien/updateNoteRH', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: entretienId, noteRH: note })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-    });
-}
-</script>
+</form>

@@ -30,6 +30,7 @@ class EntretienController{
         ];
     }
 
+
     header('Content-Type: application/json');
     echo json_encode($events);
 }
@@ -102,6 +103,25 @@ public function ListeCandidatsStade3() {
     Flight::render('ListeCandidatsStade3', [
         'candidats' => $candidats
     ]);
+}
+public function updateNoteRh() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+        $idEntretien = $_POST['save']; // vient du bouton
+        $noteRH = $_POST['notes'][$idEntretien] ?? null;
+
+        if ($noteRH !== null) {
+            $entretienModel = new Entretien(Flight::db());
+            $success = $entretienModel->updateNotesRH($idEntretien, $noteRH);
+
+            if ($success) {
+                echo "<p style='color:green;'>Note mise à jour avec succès.</p>";
+            } else {
+                echo "<p style='color:red;'>Erreur lors de la mise à jour.</p>";
+            }
+        } else {
+            echo "<p style='color:red;'>Note manquante.</p>";
+        }
+    }
 }
 
    

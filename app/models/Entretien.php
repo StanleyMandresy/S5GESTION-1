@@ -91,12 +91,38 @@ public function updateEntretien($id, $note, $remarques, $presence) {
 }
 
 public function updateNotesRH($idEntretien, $noteRH) {
-    $sql = "UPDATE Entretien SET NotesRH = :noteRH WHERE id = :id";
-    $stmt = $this->db->prepare($sql);
-    return $stmt->execute([
-        ':noteRH' => $noteRH,
-        ':id' => $idEntretien
-    ]);
+    try {
+        $this->db->beginTransaction();
+
+        // 1. Mettre à jour la note RH de l'entretien
+        $sql = "UPDATE Entretien SET NotesRH = :noteRH WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':noteRH' => $noteRH,
+            ':id' => $idEntretien
+        ]);
+
+        // 2. Récupérer l'idCandidat lié à cet entretien
+        $sqlCandidat = "SELECT idCandidat FROM Entretien WHERE id = :id";
+        $stmtC = $this->db->prepare($sqlCandidat);
+        $stmtC->execute([':id' => $idEntretien]);
+        $idCandidat = $stmtC->fetchColumn();
+
+        if ($idCandidat) {
+            // 3. Passer le candidat au stade 4
+            $sqlUpdateStade = "UPDATE candidat_avance SET stade = 4 WHERE idcandidat = :idcandidat";
+            $stmtU = $this->db->prepare($sqlUpdateStade);
+            $stmtU->execute([':idcandidat' => $idCandidat]);
+        }
+
+        $this->db->commit();
+        return true;
+
+    } catch (Exception $e) {
+        $this->db->rollBack();
+        error_log("Erreur updateNotesRH: " . $e->getMessage());
+        return false;
+    }
 }
 
 

@@ -6,6 +6,7 @@ use app\models\Department;
 use app\models\Employee;
 use app\models\Diploma;
 use app\models\Competance;
+use app\models\Candidat;
 use Flight;
 
 class JobOfferController {
@@ -167,6 +168,12 @@ class JobOfferController {
             header("Location: /offers?validation=error");
         }
         exit;
+    }
+    public function result() {
+        $candidatModel = new Candidat(Flight::db());
+        $candidats = $candidatModel->getCandidatsStade4AvecScores();
+
+        Flight::render('ListeCandidatsStade4', ['candidats' => $candidats]);
     }
 
 }

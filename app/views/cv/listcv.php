@@ -314,6 +314,13 @@
                 <input type="text" id="search-input" placeholder="Rechercher un CV..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
             </div>
 
+            <div class="flex items-center max-w-md">
+            <a href="/offers/result"
+            class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition text-center">
+            Voir les scores
+            </a>
+            </div>
+
             <div class="filter-sort flex space-x-4 relative">
                 <button id="filter-btn" class="filter-btn border border-primary text-primary px-4 py-2 rounded-full flex items-center">
                     <i class="fas fa-filter mr-2"></i> Filtres

@@ -82,5 +82,97 @@ class Candidat {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function getCandidatsStade4AvecScores() {
+        $sql = "
+        SELECT
+        c.id,
+        c.Nom,
+        c.Prenom,
+        s.totalPoints,
+        e.Notes,
+        e.NotesRH,
+        ROUND((
+            COALESCE(s.totalPoints, 0) +
+            COALESCE(e.Notes, 0) +
+            COALESCE(e.NotesRH, 0)
+            ) / 3, 2) AS moyenne
+            FROM candidates c
+            INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+            LEFT JOIN scoreTotalCandidat s ON s.idCandidat = c.id
+            LEFT JOIN Entretien e ON e.idCandidat = c.id
+            WHERE ca.stade = 4
+            ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function trierEtAvancerCandidatsStade4() {
+        try {
+            // 1️⃣ Récupérer tous les candidats de stade 4 avec leurs moyennes
+            $sql = "
+            SELECT
+            c.id,
+            c.Nom,
+            c.Prenom,
+            c.Mail,
+            COALESCE(s.totalPoints,0) AS totalPoints,
+            COALESCE(e.Notes,0) AS Notes,
+            COALESCE(e.NotesRH,0) AS NotesRH,
+            (
+                COALESCE(s.totalPoints,0) +
+                COALESCE(e.Notes,0) +
+                COALESCE(e.NotesRH,0)
+                ) / 3 AS moyenne
+                FROM candidates c
+                INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+                LEFT JOIN scoreTotalCandidat s ON s.idCandidat = c.id
+                LEFT JOIN Entretien e ON e.idCandidat = c.id
+                WHERE ca.stade = 4
+                ORDER BY moyenne DESC
+                ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $candidats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($candidats)) {
+            return "Aucun candidat en stade 4.";
+        }
+
+        // 2️⃣ Découper en deux : la moitié supérieure passe, l’autre rejetée
+        $total = count($candidats);
+        $moitie = ceil($total / 2);
+
+        $gagnants = array_slice($candidats, 0, $moitie);
+        $perdants = array_slice($candidats, $moitie);
+
+        // 3️⃣ Mise à jour des stades
+        $updateSql = "UPDATE candidat_avance SET stade = :stade WHERE idcandidat = :idcandidat";
+        $updateStmt = $this->db->prepare($updateSql);
+
+        $notification = new Notification($this->db);
+
+        foreach ($gagnants as $g) {
+            $updateStmt->execute([':stade' => 5, ':idcandidat' => $g['id']]);
+            $notification->sendNotification(
+                $g['id'],
+                "acceptation"
+            );
+        }
+
+        foreach ($perdants as $p) {
+            $updateStmt->execute([':stade' => 0, ':idcandidat' => $p['id']]);
+            $notification->sendNotification(
+                $p['id'],
+                "rejet"
+            );
+        }
+
+        return count($gagnants) . " candidats avancés au stade 5 et " . count($perdants) . " rejetés.";
+        } catch (\Throwable $th) {
+            error_log("Erreur dans trierEtAvancerCandidatsStade4: " . $th->getMessage());
+            return "Erreur : " . $th->getMessage();
+        }
+    }
 
 }

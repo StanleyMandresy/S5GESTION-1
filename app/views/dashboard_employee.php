@@ -305,7 +305,11 @@ if (session_status() === PHP_SESSION_NONE) {
             <a href="/entretien/calendrier" class="btn btn-primary-custom">
                 <i class="fas fa-paper-plane me-2"></i> Planifier Entretien
             </a>
-            
+            <?php if ($Rh != false): ?>
+            <a href="/entretien/listeEntretien" class="btn btn-primary-custom">
+            <i class="fas fa-check-circle me-2"></i> Evaluation Entretien
+            </a>
+            <?php endif; ?>
             <a href="/login" class="back-btn">
                 <i class="fas fa-arrow-left me-2"></i> Retour vers Connexion
             </a>

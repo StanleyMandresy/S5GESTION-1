@@ -147,5 +147,6 @@ class JobOffer {
             return 0;
         }
     }
+
 }
 ?>
