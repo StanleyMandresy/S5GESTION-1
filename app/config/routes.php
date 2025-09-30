@@ -12,7 +12,7 @@ use app\controllers\CandidateController;
 use app\controllers\EmployeeController;
 use app\controllers\JobOfferController;
 use app\controllers\CandidateCvController;
-
+use app\controllers\ContratController;
 
 $Auth_Controller = new AuthController();
 
@@ -75,6 +75,9 @@ $router->post('/offers/create', [$jobOffer_Controller, 'store']);       // enreg
 $router->get('/offers/validate', [$jobOffer_Controller, 'validateList']);
 $router->post('/offers/validate', [$jobOffer_Controller, 'validate']);
 $router->get('/offers/result', [$jobOffer_Controller, 'result']);
+$router->post('/offers/result', [$jobOffer_Controller, 'triFinal']);
+$router->get('/offers/accept', [$jobOffer_Controller, 'embaucherCandidat']);
+
 
 $candidateCv_Controller = new CandidateCvController();
 $router->post('/cv/form', [$candidateCv_Controller, 'formPage']);        //
@@ -111,6 +114,10 @@ $router->get('/entretien/listeEntretien', [$EntretienController, 'ListeCandidats
 $router->post('/entretien/listeEntretien', [$EntretienController, 'UpdateNoteRh']);
 
 
+Flight::route('POST /contrat/generate', function(){
+    $controller = new ContratController(Flight::db());
+    $controller->generatePDF();
+});
 
 $router->get('/hello-world/@name', function($name) {
 	echo '<h1>Hello world! Oh hey '.$name.'!</h1>';

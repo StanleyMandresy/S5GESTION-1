@@ -176,4 +176,69 @@ class JobOfferController {
         Flight::render('ListeCandidatsStade4', ['candidats' => $candidats]);
     }
 
+    public function triFinal() {
+
+        try {
+             $candidatModel = new Candidat(Flight::db());
+            $message = $candidatModel->trierEtAvancerCandidatsStade4();
+
+            // ⚡ soit tu affiches un message brut
+            // echo $message;
+
+            // ⚡ soit tu rediriges vers la liste avec un flash message
+            $_SESSION['flash'] = $message;
+            $_SESSION['tri_done'] = true;
+            Flight::redirect('/offers/result');
+        } catch (\Throwable $th) {
+            error_log("Erreur avancerStade4 Controller : " . $th->getMessage());
+            Flight::halt(500, "Erreur interne");
+        }
+    }
+    public function embaucherCandidat() {
+        try {
+            // Récupérer les données POST
+            $idCandidat = $_GET['idCandidat'] ?? null;
+            $jobOfferId = $_GET['job_offer_id'] ?? null;
+
+            // Validation des données
+            if (!$idCandidat || !$jobOfferId) {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'ID candidat et ID offre requis'
+                ], 400);
+                return;
+            }
+
+            // Appeler la méthode du modèle
+            $candidatModel = new Candidat(Flight::db());
+            $result = $candidatModel->embaucherCandidat($idCandidat, $jobOfferId);
+
+            if ($result['success']) {
+                // Succès - redirection ou message JSON
+                $_SESSION['flash'] = [
+                    'type' => 'success',
+                    'message' => $result['message']
+                ];
+
+                Flight::json([
+                    'success' => true,
+                    'message' => $result['message'],
+                    'redirect' => '/candidats/list' // ou autre page
+                ]);
+            } else {
+                // Erreur
+                Flight::json([
+                    'success' => false,
+                    'message' => $result['message']
+                ], 400);
+            }
+
+        } catch (\Exception $e) {
+            error_log("Erreur contrôleur embauche: " . $e->getMessage());
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
+        }
+    }
 }

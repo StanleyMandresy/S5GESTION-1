@@ -139,12 +139,9 @@ class Candidat {
             return "Aucun candidat en stade 4.";
         }
 
-        // 2️⃣ Découper en deux : la moitié supérieure passe, l’autre rejetée
-        $total = count($candidats);
-        $moitie = ceil($total / 2);
-
-        $gagnants = array_slice($candidats, 0, $moitie);
-        $perdants = array_slice($candidats, $moitie);
+        // 2️⃣ Le meilleur candidat passe, les autres sont rejetés
+        $gagnant = $candidats[0]; // le premier candidat après tri
+        $perdants = array_slice($candidats, 1);
 
         // 3️⃣ Mise à jour des stades
         $updateSql = "UPDATE candidat_avance SET stade = :stade WHERE idcandidat = :idcandidat";
@@ -152,26 +149,113 @@ class Candidat {
 
         $notification = new Notification($this->db);
 
-        foreach ($gagnants as $g) {
-            $updateStmt->execute([':stade' => 5, ':idcandidat' => $g['id']]);
-            $notification->sendNotification(
-                $g['id'],
-                "acceptation"
-            );
-        }
+        // ✅ Meilleur candidat passe
+        $updateStmt->execute([':stade' => 5, ':idcandidat' => $gagnant['id']]);
+        $notification->sendNotification($gagnant['id'], "acceptation");
 
+        // ❌ Les autres sont rejetés
         foreach ($perdants as $p) {
             $updateStmt->execute([':stade' => 0, ':idcandidat' => $p['id']]);
-            $notification->sendNotification(
-                $p['id'],
-                "rejet"
-            );
+            $notification->sendNotification($p['id'], "rejet");
         }
 
-        return count($gagnants) . " candidats avancés au stade 5 et " . count($perdants) . " rejetés.";
+        return "1 candidat avancé au stade 5 et " . count($perdants) . " rejetés.";
+
         } catch (\Throwable $th) {
             error_log("Erreur dans trierEtAvancerCandidatsStade4: " . $th->getMessage());
             return "Erreur : " . $th->getMessage();
+        }
+    }
+    public function embaucherCandidat($idCandidat, $jobOfferId) {
+        try {
+            $this->db->beginTransaction();
+
+            // 1️⃣ Vérifier que le candidat existe et récupérer son user_id
+            $sqlCandidat = "SELECT c.user_id, c.Mail, u.role
+            FROM candidates c
+            LEFT JOIN users u ON u.id = c.user_id
+            INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+            WHERE c.id = :idCandidat AND ca.job_offer_id = :jobOfferId";
+
+            $stmt = $this->db->prepare($sqlCandidat);
+            $stmt->execute([
+                ':idCandidat' => $idCandidat,
+                ':jobOfferId' => $jobOfferId
+            ]);
+            $candidat = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$candidat) {
+                throw new Exception("Candidat non trouvé ou non associé à cette offre");
+            }
+
+            // 2️⃣ Vérifier si le candidat a un user_id
+            if (!$candidat['user_id']) {
+                throw new Exception("Ce candidat n'a pas de compte utilisateur associé");
+            }
+
+            // 3️⃣ Changer le rôle à 'employee'
+            $sqlUpdateRole = "UPDATE users SET role = 'employee' WHERE id = :user_id";
+            $stmtUpdate = $this->db->prepare($sqlUpdateRole);
+            $stmtUpdate->execute([':user_id' => $candidat['user_id']]);
+
+            // 4️⃣ Vérifier si l'employé existe déjà, sinon le créer
+            $sqlCheckEmployee = "SELECT id FROM employees WHERE id = :user_id";
+            $stmtCheck = $this->db->prepare($sqlCheckEmployee);
+            $stmtCheck->execute([':user_id' => $candidat['user_id']]);
+
+            if (!$stmtCheck->fetch()) {
+                // Récupérer le département depuis l'offre d'emploi
+                $sqlJobOffer = "SELECT department_id, title FROM job_offers WHERE id = :jobOfferId";
+                $stmtJob = $this->db->prepare($sqlJobOffer);
+                $stmtJob->execute([':jobOfferId' => $jobOfferId]);
+                $job = $stmtJob->fetch(PDO::FETCH_ASSOC);
+
+                // Créer l'entrée dans employees
+                $sqlInsertEmployee = "INSERT INTO employees (id, department_id, position)
+                VALUES (:id, :department_id, :position)";
+
+                $stmtEmployee = $this->db->prepare($sqlInsertEmployee);
+                $stmtEmployee->execute([
+                    ':id' => $candidat['user_id'],
+                    ':department_id' => $job['department_id'] ?? null,
+                    ':position' => $job['title'] ?? 'Nouvel employé'
+                ]);
+            }
+
+            // 5️⃣ Mettre à jour le stade à 10 (embauché)
+            $sqlUpdateStade = "UPDATE candidat_avance SET stade = 10
+            WHERE idcandidat = :idCandidat AND job_offer_id = :jobOfferId";
+
+            $stmtStade = $this->db->prepare($sqlUpdateStade);
+            $stmtStade->execute([
+                ':idCandidat' => $idCandidat,
+                ':jobOfferId' => $jobOfferId
+            ]);
+
+            // 6️⃣ Mettre l'offre d'emploi inactive
+            $sqlUpdateJobOffer = "UPDATE job_offers SET is_active = FALSE WHERE id = :jobOfferId";
+            $stmtJobOffer = $this->db->prepare($sqlUpdateJobOffer);
+            $stmtJobOffer->execute([':jobOfferId' => $jobOfferId]);
+
+            $this->db->commit();
+
+            return [
+                'success' => true,
+                'message' => "Candidat embauché avec succès ! Rôle changé en 'employee' et offre d'emploi désactivée",
+                'user_id' => $candidat['user_id'],
+                'new_role' => 'employee',
+                'stade' => 10,
+                'job_offer_active' => false
+            ];
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            error_log("Erreur embauche candidat: " . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => "Erreur lors de l'embauche: " . $e->getMessage()
+            ];
         }
     }
 

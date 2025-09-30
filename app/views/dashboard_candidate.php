@@ -104,6 +104,21 @@
             <span class="text-success fw-bold">Attente d'entretien</span>
             <?php elseif ($offer['applied'] && $offer['stade'] == 0): ?>
             <span class="text-danger fw-bold">Vous avez été rejeté</span>
+            <?php elseif ($offer['applied'] && $offer['stade'] == 5): ?>
+            <form action="/contrat/generate" method="POST" target="_blank" style="display:inline;">
+            <input type="hidden" name="idCandidat" value="<?= $profile['id'] ?>">
+            <input type="hidden" name="job_offer_id" value="<?= $offer['id'] ?>">
+            <button type="submit" class="btn btn-primary">
+            Télécharger Contrat d'essai
+            </button>
+            </form>
+            <div style="display:inline; margin-left: 10px;">
+            <a href="/offers/accept?idCandidat=<?= $profile['id'] ?>&job_offer_id=<?= $offer['id'] ?>"
+            class="btn btn-success"
+            onclick="return confirm('Êtes-vous sûr de vouloir d'accepter  ?')">
+            ✅ Accepter
+            </a>
+            </div>
             <?php else: ?>
             <form action="/cv/form" method="POST" class="d-inline">
             <input type="hidden" name="job_offer_id" value="<?= $offer['id'] ?>">

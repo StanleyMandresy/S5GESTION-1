@@ -1,4 +1,69 @@
 
+<style>
+/* Corps de page */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e8f5e9; /* vert très clair */
+    padding: 20px;
+}
+
+/* Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* En-tête */
+.table thead {
+    background-color: #4caf50; /* vert */
+    color: white;
+    text-align: left;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+}
+
+/* Lignes impaires */
+.table tbody tr:nth-child(odd) {
+    background-color: #f1f8f3; /* vert très pâle */
+}
+
+/* Lignes au survol */
+.table tbody tr:hover {
+    background-color: #c8e6c9; /* vert clair */
+    transition: 0.3s;
+}
+
+/* Inputs */
+input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #4caf50;
+    border-radius: 4px;
+}
+
+/* Boutons */
+button[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+</style>
+
 <form action="/entretien/listeEntretien" method="POST">
 <table class="table">
 <thead>
