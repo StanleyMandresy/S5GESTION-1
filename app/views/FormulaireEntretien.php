@@ -249,21 +249,45 @@
                     <p class="text-center mb-8" style="color: var(--color-dark-medium);">Remplissez les informations ci-dessous pour planifier un entretien</p>
                     
                     <form method="POST" action="/entretien/create" id="entretienForm" class="space-y-6">
-                        <!-- Sélection du candidat -->
-                        <div class="form-control">
-                            <label for="idCandidat" class="label">
-                                <span class="label-text font-semibold text-lg">
-                                    <i class="bi bi-person-badge mr-2 calendar-icon"></i>Candidat :
-                                </span>
-                            </label>
-                            <select name="idCandidat" id="idCandidat" class="select select-bordered w-full form-input p-3 rounded-lg text-lg" required>
-                                <option value="" disabled selected>Sélectionnez un candidat</option>
-                                <?php foreach($candidats as $candidat): ?>
-                                    <option value="<?= $candidat['id'] ?>" class="candidate-option"><?= htmlspecialchars($candidat['Nom']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        
+
+                    <!-- Sélection de l'offre d'emploi -->
+                    <div class="form-control">
+                    <label for="job_offer_id" class="label">
+                    <span class="label-text font-semibold text-lg">
+                    <i class="bi bi-briefcase mr-2 calendar-icon"></i>Offre d'emploi :
+                    </span>
+                    </label>
+                    <select name="job_offer_id" id="job_offer_id" class="select select-bordered w-full form-input p-3 rounded-lg text-lg" required onchange="loadCandidates(this.value)">
+                    <option value="" disabled selected>Sélectionnez une offre</option>
+                    <?php if (!empty($offres)): ?>
+                    <?php foreach($offres as $offre): ?>
+                    <option value="<?= $offre['id'] ?>" class="offer-option">
+                    <?= htmlspecialchars($offre['title']) ?>
+                    - <?= htmlspecialchars($offre['name']) ?>
+                    - <?= htmlspecialchars($offre['locations']) ?>
+                    </option>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                    <option value="" disabled>Aucune offre active dans votre département</option>
+                    <?php endif; ?>
+                    </select>
+                    </div>
+
+                    <!-- Sélection du candidat (chargé dynamiquement) -->
+                    <div class="form-control">
+                    <label for="idCandidat" class="label">
+                    <span class="label-text font-semibold text-lg">
+                    <i class="bi bi-person-badge mr-2 calendar-icon"></i>Candidat :
+                    </span>
+                    </label>
+                    <select name="idCandidat" id="idCandidat" class="select select-bordered w-full form-input p-3 rounded-lg text-lg" required disabled>
+                    <option value="" selected>Veuillez d'abord sélectionner une offre</option>
+                    </select>
+                    <div id="candidateLoading" class="hidden mt-2">
+                    <div class="loading loading-spinner loading-sm"></div>
+                    <span class="text-sm ml-2">Chargement des candidats...</span>
+                    </div>
+                    </div>
                         <!-- Date et heure -->
                         <div class="form-control">
                         <label for="date_heure_debut" class="label">
@@ -453,5 +477,62 @@
             observer.observe(card);
         });
     </script>-->
+    <script>
+    // Stocker tous les candidats dans une variable globale
+    const allCandidates = <?= json_encode($candidats) ?>;
+
+    function loadCandidates(jobOfferId) {
+        const candidateSelect = document.getElementById('idCandidat');
+        const loadingDiv = document.getElementById('candidateLoading');
+
+        if (!jobOfferId) {
+            candidateSelect.innerHTML = '<option value="" selected>Veuillez d\'abord sélectionner une offre</option>';
+            candidateSelect.disabled = true;
+            return;
+        }
+
+        // Afficher le loading
+        candidateSelect.disabled = true;
+        loadingDiv.classList.remove('hidden');
+        candidateSelect.innerHTML = '<option value="">Filtrage des candidats...</option>';
+
+        // Simuler un délai pour le loading (optionnel)
+        setTimeout(() => {
+            // Filtrer les candidats côté client par job_offer_id
+            const filteredCandidates = allCandidates.filter(candidat =>
+            candidat.job_offer_id == jobOfferId
+            );
+
+            candidateSelect.innerHTML = '';
+
+        if (filteredCandidates.length > 0) {
+            candidateSelect.innerHTML += '<option value="" disabled selected>Sélectionnez un candidat</option>';
+        filteredCandidates.forEach(candidat => {
+            candidateSelect.innerHTML += `
+            <option value="${candidat.id}">
+            ${candidat.Nom} ${candidat.Prenom}
+            </option>
+            `;
+        });
+        candidateSelect.disabled = false;
+        } else {
+            candidateSelect.innerHTML = '<option value="" disabled selected>Aucun candidat au stade 3 pour cette offre</option>';
+        candidateSelect.disabled = true;
+        }
+
+        loadingDiv.classList.add('hidden');
+        }, 300); // Petit délai pour l'effet visuel
+    }
+
+    // Initialiser le formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        const jobOfferSelect = document.getElementById('job_offer_id');
+
+        // Si une offre est déjà sélectionnée (après rechargement), charger les candidats
+        if (jobOfferSelect.value) {
+            loadCandidates(jobOfferSelect.value);
+        }
+    });
+    </script>
 </body>
 </html>

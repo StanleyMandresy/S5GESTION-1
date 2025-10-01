@@ -23,6 +23,7 @@ class CandidateController {
       $profile   = $candidateModel->getProfile($userId);
       $jobOffers = $jobOfferModel->getJobOffers();
 
+
       // Vérifier si le candidat a postulé à chaque offre et récupérer le stade
       foreach ($jobOffers as &$offer) {
           $offer['applied'] = $candidateModel->hasApplied($profile['id'], $offer['id']);

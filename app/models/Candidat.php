@@ -41,7 +41,7 @@ class Candidat {
             $stade = $stmt->fetchColumn();
 
             if ($stade === false) {
-                return null; // pas encore dans candidat_avance
+                return 1; // pas encore dans candidat_avance
             }
             return (int)$stade;
 
@@ -58,16 +58,31 @@ class Candidat {
         $stmt->execute([$candidateId, $jobOfferId]);
         return $stmt->fetchColumn() > 0;
     }
-    public function findAllCandidatsStade3() {
-        $sql = "
-        SELECT c.*
-        FROM candidates c
-        INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
-        WHERE ca.stade = 3
-        ";
+    public function findAllCandidatsStade3($job_offer_id = null) {
+        if ($job_offer_id) {
+            // Avec filtre par offre d'emploi
+            $sql = "
+            SELECT c.*, ca.job_offer_id
+            FROM candidates c
+            INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+            WHERE ca.stade = 3 AND ca.job_offer_id = :job_offer_id
+            ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':job_offer_id' => $job_offer_id]);
+        } else {
+            // Sans filtre - tous les candidats stade 3
+            $sql = "
+            SELECT c.*, ca.job_offer_id
+            FROM candidates c
+            INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
+            WHERE ca.stade = 3
+            ";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+        }
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     public function findAllCandidatsStade3AvecEntretien() {

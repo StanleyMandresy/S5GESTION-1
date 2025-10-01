@@ -21,6 +21,7 @@ class EmployeeController {
 
         // Profil de l'employé
         $profile = $employeeModel->getProfile($userId);
+        $_SESSION['idDepartement']=$profile['department_id'];
 
         // Vérifier que le profil existe
         if ($profile) {

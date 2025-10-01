@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Entretien;
 use app\models\Candidat;
 use app\models\Notification;
+use app\models\JobOffer;
 use Flight;
 
 class EntretienController{
@@ -34,45 +35,35 @@ class EntretienController{
     header('Content-Type: application/json');
     echo json_encode($events);
 }
-  public function EntretienForm() {
+public function EntretienForm() {
+    // Récupérer le département depuis la session
+    $department_id =  $_SESSION['idDepartement'] ?? null;
 
-		$candidats =new Candidat(Flight::db());
-		  $candidats = $candidats->findAllCandidatsStade3();
-
-
-		Flight::render('FormulaireEntretien', [
-        'candidats' => $candidats
-    ]);
-     
-    }
-public function createEntretien() {
-    // Récupérer les données POST
-    var_dump($_POST);
-
-    $idCandidat = $_POST['idCandidat'] ?? null;
-    $date_heure_debut = $_POST['date_heure_debut'] ?? null;
-
-    if (!$idCandidat || !$date_heure_debut) {
-        echo "<p style='color:red;'>Candidat ou date manquante</p>";
+    if (!$department_id) {
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'message' => 'Département non défini. Veuillez vous reconnecter.'
+        ];
+        Flight::redirect('/dashboard');
         return;
     }
 
-    $entretienModel = new Entretien(Flight::db());
-    $planification = $entretienModel->PlanifierEntretien($idCandidat, $date_heure_debut);
+    $offreModel = new JobOffer(Flight::db());
+    $candidatModel = new Candidat(Flight::db());
 
-    $notification = new Notification(Flight::db());
-    $notificationSent = $notification->sendNotification($idCandidat, "entretien", $date_heure_debut);
+    // Récupérer les offres actives du département
 
-    // Afficher un message
-    if ($planification && $notificationSent) {
-        echo "<p style='color:green;'>Entretien planifié et notification envoyée avec succès.</p>";
-    } elseif ($planification) {
-        echo "<p style='color:orange;'>Entretien planifié mais la notification a échoué.</p>";
-    } else {
-        echo "<p style='color:red;'>Erreur lors de la planification de l'entretien.</p>";
-    }
+    // Récupérer TOUS les candidats stade 3 avec leurs job_offer_id
+    $allCandidats = $candidatModel->findAllCandidatsStade3();
+    // Récupérer les offres actives du département
+    $offres = $offreModel->getByDepartment($department_id);
+
+    Flight::render('FormulaireEntretien', [
+        'candidats' => $allCandidats , // Pas de candidats au début
+        'offres' => $offres,
+        'department_id' => $department_id
+    ]);
 }
-
 public function updateEntretien() {
     // Récupérer le JSON envoyé par fetch()
     $data = json_decode(file_get_contents("php://input"), true);
@@ -95,6 +86,56 @@ public function updateEntretien() {
     } else {
         echo json_encode(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
     }
+}
+public function createEntretien() {
+    // Récupérer les données POST
+    $idCandidat = $_POST['idCandidat'] ?? null;
+    $job_offer_id = $_POST['job_offer_id'] ?? null;
+    $date_heure_debut = $_POST['date_heure_debut'] ?? null;
+    $duree = $_POST['duree'] ?? 45;
+    $type_entretien = $_POST['type_entretien'] ?? 'presentiel';
+
+    // Validation des données
+    if (!$idCandidat || !$job_offer_id || !$date_heure_debut) {
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'message' => 'Données manquantes: candidat, offre ou date'
+        ];
+        Flight::redirect('/entretien/form');
+        return;
+    }
+
+    $entretienModel = new Entretien(Flight::db());
+    $planification = $entretienModel->PlanifierEntretien(
+        $idCandidat,
+        $date_heure_debut,
+        $job_offer_id,
+        $duree,
+        $type_entretien
+    );
+
+    if ($planification['success']) {
+        // Envoyer la notification seulement si l'entretien est planifié avec succès
+        $notification = new Notification(Flight::db());
+
+        // Formater la date pour l'affichage
+        $dateFormatee = date('d/m/Y à H:i', strtotime($date_heure_debut));
+        $notificationSent = $notification->sendNotification($idCandidat, "entretien", $dateFormatee);
+
+
+
+        $_SESSION['flash'] = [
+            'type' => 'success',
+            'message' => $planification['message'] . ($notificationSent ? ' et notification envoyée' : ' mais notification échouée')
+        ];
+    } else {
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'message' => $planification['message']
+        ];
+    }
+
+    Flight::redirect('/entretien/calendrier');
 }
 public function ListeCandidatsStade3() {
     $candidats = new Candidat(Flight::db());

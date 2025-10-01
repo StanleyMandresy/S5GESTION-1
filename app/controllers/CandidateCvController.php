@@ -148,7 +148,7 @@ class CandidateCvController {
         );
 
         // Redirection après enregistrement
-        header("Location: /cv/my");
+        header("Location: /dashboard/candidate");
         exit;
     }
 
@@ -210,5 +210,28 @@ class CandidateCvController {
         exit;
     }
 
+    public function trier() {
+        try {
+            // Récupération du job_offer_id depuis le POST
+            $jobOfferId = $_POST['job_offer_id'] ?? null;
+            $cvModel = new CandidateCv(Flight::db());
+            if (!$jobOfferId) {
+                Flight::halt(400, "Aucune offre spécifiée");
+                return;
+            }
 
+            // Appel du modèle pour trier et notifier
+            $cvModel->trierCVs($jobOfferId);
+
+            // Message flash en session
+            $_SESSION['success_message'] = "✅ CVs triés avec succès, notifications envoyées.";
+
+            // Redirection vers la liste des CVs
+            Flight::redirect("/cv/job/$jobOfferId");
+
+        } catch (Exception $e) {
+            error_log("Erreur Controller trierCVs : " . $e->getMessage());
+            Flight::halt(500, "Erreur lors du tri des CVs");
+        }
+}
 }

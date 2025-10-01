@@ -441,6 +441,8 @@
                         <span class="text-sm"><?= htmlspecialchars($cv['address'] ?? '') ?></span>
                     </div>
 
+
+
                     <div class="cv-detail flex items-center mb-2">
                         <span class="cv-detail-label w-8 mr-2"><i class="fas fa-chart-line"></i></span>
                         <span><?= htmlspecialchars($cv['experience_year'] ?? '') ?> ans d'expérience</span>
