@@ -139,10 +139,21 @@ public function createEntretien() {
 }
 public function ListeCandidatsStade3() {
     $candidats = new Candidat(Flight::db());
-    $candidats = $candidats->findAllCandidatsStade3AvecEntretien();
+    $job=new JobOffer(Flight::db());
+    $jobOffers = $job->getJobOffers();
+
+    // Récupérer l'offre sélectionnée (si existante)
+    $selectedOffre = $_GET['offre'] ?? null;
+    $candidatsData = [];
+
+    if ($selectedOffre) {
+        $candidatsData = $candidats->findAllCandidatsStade3AvecEntretien($selectedOffre);
+    }
 
     Flight::render('ListeCandidatsStade3', [
-        'candidats' => $candidats
+        'candidats' => $candidatsData,
+        'jobOffers' => $jobOffers,
+        'selectedOffre' => $selectedOffre
     ]);
 }
 public function updateNoteRh() {

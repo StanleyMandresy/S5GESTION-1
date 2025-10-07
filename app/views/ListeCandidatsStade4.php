@@ -102,11 +102,11 @@ padding:10px;
 margin-bottom:15px;
 border-radius:6px;
 ">
-<?= htmlspecialchars($_SESSION['flash']) ?>
-</div>
-<?php unset($_SESSION['flash']); ?>
-<?php endif; ?>
 
+
+<?php echo $_SESSION['flash']; ?>
+<?php endif; ?>
+</div>
 <h2>Liste des candidats (Stade 4)</h2>
 
 <!-- Bouton Trier -->

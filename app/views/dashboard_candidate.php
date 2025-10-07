@@ -38,12 +38,7 @@
         <p><strong>Email :</strong> <?= htmlspecialchars($profile['email']) ?></p>
         <p><strong>Téléphone :</strong> <?= htmlspecialchars($profile['phone'] ?? '-') ?></p>
         <p><strong>Adresse :</strong> <?= htmlspecialchars($profile['address'] ?? '-') ?></p>
-        <?php if(!empty($profile['resume_path'])): ?>
-            <a href="/candidate/download/<?= $profile['id'] ?>" 
-               class="btn btn-outline-success mt-4 rounded-pill shadow-sm hover:scale-105 transition">
-                <i class="bi bi-download me-1"></i> Télécharger CV
-            </a>
-        <?php endif; ?>
+
     </section>
 
     <!-- Offres d'emploi -->

@@ -1,10 +1,44 @@
-
 <style>
 /* Corps de page */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #e8f5e9; /* vert très clair */
+    background-color: #e8f5e9;
     padding: 20px;
+}
+
+/* Formulaire de sélection */
+.selection-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.selection-form select, .selection-form button {
+    padding: 10px 15px;
+    border: 1px solid #4caf50;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.selection-form select {
+    width: 300px;
+    background-color: white;
+}
+
+.selection-form button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.selection-form button:hover {
+    background-color: #45a049;
 }
 
 /* Table */
@@ -19,7 +53,7 @@ body {
 
 /* En-tête */
 .table thead {
-    background-color: #4caf50; /* vert */
+    background-color: #4caf50;
     color: white;
     text-align: left;
 }
@@ -30,12 +64,12 @@ body {
 
 /* Lignes impaires */
 .table tbody tr:nth-child(odd) {
-    background-color: #f1f8f3; /* vert très pâle */
+    background-color: #f1f8f3;
 }
 
 /* Lignes au survol */
 .table tbody tr:hover {
-    background-color: #c8e6c9; /* vert clair */
+    background-color: #c8e6c9;
     transition: 0.3s;
 }
 
@@ -62,9 +96,45 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: #45a049;
 }
+
+/* Message d'information */
+.info-message {
+    background-color: #e3f2fd;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+    text-align: center;
+    color: #1976d2;
+}
 </style>
 
+<!-- Formulaire de sélection de l'offre -->
+<div class="selection-form">
+<form method="GET" action="">
+<label for="offre"><strong>Sélectionner une offre d'emploi :</strong></label>
+<select name="offre" id="offre" required>
+<option value="">-- Choisir une offre --</option>
+<?php foreach ($jobOffers as $offer): ?>
+<option value="<?= $offer['id'] ?>"
+<?= ($selectedOffre == $offer['id']) ? 'selected' : '' ?>>
+<?= htmlspecialchars($offer['title']) ?>
+</option>
+<?php endforeach; ?>
+</select>
+<button type="submit">📋 Afficher les candidats</button>
+</form>
+</div>
+
+<?php if ($selectedOffre && empty($candidats)): ?>
+<div class="info-message">
+ℹ️ Aucun candidat trouvé pour cette offre d'emploi au stade 3.
+</div>
+<?php elseif ($selectedOffre && !empty($candidats)): ?>
+<!-- Formulaire d'évaluation des candidats -->
 <form action="/entretien/listeEntretien" method="POST">
+<input type="hidden" name="idOffre" value="<?= $selectedOffre ?>">
+
 <table class="table">
 <thead>
 <tr>
@@ -97,3 +167,8 @@ min="0" max="20">
 </tbody>
 </table>
 </form>
+<?php elseif (!$selectedOffre): ?>
+<div class="info-message">
+🔍 Veuillez sélectionner une offre d'emploi pour afficher les candidats.
+</div>
+<?php endif; ?>

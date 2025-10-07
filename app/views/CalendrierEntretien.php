@@ -361,6 +361,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -377,23 +378,36 @@
                     hour12: false
                 },
                 eventDidMount: function(info) {
-                    // Ajouter un badge de statut selon l'état de l'événement
-                    const status = info.event.extendedProps.status || 'planned';
-                    let statusBadge = document.createElement('span');
-                    statusBadge.classList.add('event-status-badge');
+            const status = info.event.extendedProps.status || 'planned';
+            const presence = info.event.extendedProps.presence || 'absents'; // Par défaut absent
+       const extendedProps = info.event.extendedProps;
 
-                    if (status === 'completed') {
-                        statusBadge.classList.add('status-completed');
-                        statusBadge.textContent = 'Terminé';
-                    } else if (status === 'cancelled') {
-                        statusBadge.classList.add('status-cancelled');
-                        statusBadge.textContent = 'Annulé';
-                    } else {
-                        statusBadge.classList.add('status-planned');
-                        statusBadge.textContent = 'Planifié';
-                    }
 
-                    info.el.querySelector('.fc-event-title').appendChild(statusBadge);
+            // Changer la couleur de l'événement selon la présence
+            if (presence === 'presents') {
+                info.el.style.backgroundColor = '#28a745'; // Vert pour présent
+            info.el.style.borderColor = '#28a745';
+            } else {
+                info.el.style.backgroundColor = '#dc3545'; // Rouge pour absent/non signalé
+            info.el.style.borderColor = '#dc3545';
+            }
+
+            // Ajouter un badge de statut selon l'état de l'événement
+            let statusBadge = document.createElement('span');
+            statusBadge.classList.add('event-status-badge');
+
+            if (status === 'completed') {
+                statusBadge.classList.add('status-completed');
+                statusBadge.textContent = 'Terminé';
+            } else if (status === 'cancelled') {
+                statusBadge.classList.add('status-cancelled');
+                statusBadge.textContent = 'Annulé';
+            } else {
+                statusBadge.classList.add('status-planned');
+                statusBadge.textContent = 'Planifié';
+            }
+
+            info.el.querySelector('.fc-event-title').appendChild(statusBadge);
                 },
                 select: function(info) {
                     let date = info.startStr;
@@ -413,6 +427,7 @@
                     let id = info.event.id;
                     let title = info.event.title;
                     let start = info.event.start;
+
 
                     if (info.event.extendedProps.presence === 'presents') {
                         showNotification("Candidat déjà présent : modification interdite", "info");

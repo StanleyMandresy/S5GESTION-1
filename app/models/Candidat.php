@@ -85,19 +85,39 @@ class Candidat {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function findAllCandidatsStade3AvecEntretien() {
+    public function findAllCandidatsStade3AvecEntretien($idOffre = null) {
         $sql = "
-        SELECT c.*, e.id AS entretien_id, e.Date_heure_debut, e.NotesRH
+        SELECT
+        c.*,
+        e.id AS entretien_id,
+        e.Date_heure_debut,
+        e.NotesRH,
+        e.idOffre,
+        jo.title AS offre_title
         FROM candidates c
         INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
         INNER JOIN Entretien e ON e.idCandidat = c.id
+        LEFT JOIN job_offers jo ON jo.id = e.idOffre
         WHERE ca.stade = 3
         ";
+
+        // Ajouter le filtre par offre si spécifié
+        if ($idOffre) {
+            $sql .= " AND e.idOffre = :idOffre";
+        }
+
+        $sql .= " ORDER BY c.Nom, c.Prenom";
+
         $stmt = $this->db->prepare($sql);
+
+        if ($idOffre) {
+            $stmt->bindValue(':idOffre', $idOffre, PDO::PARAM_INT);
+        }
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getCandidatsStade4AvecScores() {
+    public function getCandidatsStade4AvecScores($job_offer_id = null) {
         $sql = "
         SELECT
         c.id,
@@ -106,6 +126,8 @@ class Candidat {
         s.totalPoints,
         e.Notes,
         e.NotesRH,
+        e.idOffre,
+        jo.title AS offre_title,
         ROUND((
             COALESCE(s.totalPoints, 0) +
             COALESCE(e.Notes, 0) +
@@ -115,10 +137,23 @@ class Candidat {
             INNER JOIN candidat_avance ca ON ca.idcandidat = c.id
             LEFT JOIN scoreTotalCandidat s ON s.idCandidat = c.id
             LEFT JOIN Entretien e ON e.idCandidat = c.id
+            LEFT JOIN job_offers jo ON jo.id = e.idOffre
             WHERE ca.stade = 4
             ";
 
+        // Ajouter le filtre par offre si spécifié
+        if ($job_offer_id) {
+            $sql .= " AND e.idOffre = :job_offer_id";
+        }
+
+        $sql .= " ORDER BY moyenne DESC, c.Nom, c.Prenom";
+
         $stmt = $this->db->prepare($sql);
+
+        if ($job_offer_id) {
+            $stmt->bindValue(':job_offer_id', $job_offer_id, PDO::PARAM_INT);
+        }
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

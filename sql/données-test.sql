@@ -116,4 +116,26 @@ INSERT INTO candidate_cv_data (
 (6, 1, CURDATE(), 3, 2, 1, 'Français', 'Mutuelle', 'Esprit d analyse', 1100.00, 'Temps partiel', 'photos/cand6.jpg'),
 (7, 1, CURDATE(), 3, 5, 6, 'Français, Anglais', 'Tickets restaurant, Télétravail', 'Motivée, dynamique', 2000.00, 'Temps plein', 'photos/cand7.jpg');
 
+--WARNING/ apres tri cv
+UPDATE users
+SET email = 'fikaonceforever@gmail.com'
+WHERE id = 5;
+UPDATE candidates
+SET Mail = 'fikaonceforever@gmail.com'
+WHERE id = 2;
+
+
+--WARNING apres qcm candidat 2
+INSERT INTO scoreTotalCandidat (idCandidat, totalPoints)
+VALUES
+    (4, 10),
+    (7, 3);
+UPDATE candidat_avance
+SET stade = 3
+WHERE idcandidat IN (4, 7);
+
+
+
+
+--WARNING
 

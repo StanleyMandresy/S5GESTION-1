@@ -171,11 +171,18 @@ class JobOfferController {
     }
     public function result() {
         $candidatModel = new Candidat(Flight::db());
-        $candidats = $candidatModel->getCandidatsStade4AvecScores();
 
-        Flight::render('ListeCandidatsStade4', ['candidats' => $candidats]);
+        // Récupérer l'ID de l'offre depuis les paramètres GET ou de la route
+        $job_offer_id = Flight::request()->query['offre'] ?? null;
+
+        $candidats = $candidatModel->getCandidatsStade4AvecScores($job_offer_id);
+
+
+
+        Flight::render('ListeCandidatsStade4', [
+            'candidats' => $candidats
+        ]);
     }
-
     public function triFinal() {
 
         try {

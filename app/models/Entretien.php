@@ -12,28 +12,32 @@ class Entretien {
         $this->db = $db;
     }
 
-public function getEntretiens() {
-    $sql = "SELECT e.id, c.Nom, e.Date_heure_debut, e.Date_heure_fin, e.Presence, e.Notes 
-            FROM Entretien e 
-            JOIN candidates c ON e.idCandidat = c.id";
-    $stmt = $this->db->query($sql);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function getEntretiens() {
+        $sql = "SELECT e.id, c.Nom, e.Date_heure_debut, e.Date_heure_fin, e.Presence, e.Notes
+        FROM Entretien e
+        JOIN candidates c ON e.idCandidat = c.id";
+        $stmt = $this->db->query($sql);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $events = [];
-    foreach ($rows as $row) {
-        $events[] = [
-            'id' => $row['id'],
-  
-            'Nom' => $row['Nom'],
-            'start' => $row['Date_heure_debut'],
-            'end' => $row['Date_heure_fin'],
-            'presence' => $row['Presence'],
-            'note' => $row['Notes']
-        ];
+        $events = [];
+        foreach ($rows as $row) {
+            $events[] = [
+                'id' => $row['id'],
+                'title' => $row['Nom'], // ⚠️ Important: utiliser 'title' au lieu de 'Nom'
+                'start' => $row['Date_heure_debut'],
+                'end' => $row['Date_heure_fin'],
+                'extendedProps' => [ // ⚠️ Important: mettre dans extendedProps
+                'presence' => $row['Presence'],
+                'note' => $row['Notes']
+                ]
+            ];
+        }
+
+        // Headers JSON corrects
+        header('Content-Type: application/json');
+        echo json_encode($events);
+        exit;
     }
-
-    return $events;
-}
 public function PlanifierEntretien($idCandidat, $date_heure_debut, $job_offer_id, $duree = 60, $type_entretien = 'presentiel') {
     $entretienModel = new Entretien($this->db);
 

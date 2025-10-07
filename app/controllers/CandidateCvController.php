@@ -1,6 +1,6 @@
 <?php
 namespace app\controllers;
-require_once(__DIR__ . '/../../vendor/autoload.php');
+require_once __DIR__ . '/../pdf/fpdf.php';
 
 use app\models\CandidateCv;
 
@@ -14,6 +14,7 @@ class CandidateCvController {
             echo 'ID du CV manquant.';
             return;
         }
+
         $cvModel = new CandidateCv(Flight::db());
         $cv = $cvModel->getById($id);
         if (!$cv) {
@@ -21,68 +22,116 @@ class CandidateCvController {
             return;
         }
 
-        // Générer le HTML du CV avec un design inspiré de la vue
-        $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CV PDF</title>';
-        $html .= '<style>
-            body { font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif; background: #DCDED6; }
-            .container { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 24px rgba(93,114,111,0.15); overflow: hidden; }
-            .header { background: #859393; color: #fff; padding: 30px 40px; border-radius: 20px 20px 0 0; }
-            .profile-img { width: 120px; height: 120px; border-radius: 50%; border: 5px solid #CED0C3; object-fit: cover; box-shadow: 0 8px 16px rgba(93,114,111,0.3); float: left; margin-right: 30px; }
-            .title { font-size: 2em; font-weight: bold; margin-bottom: 10px; }
-            .subtitle { font-size: 1.2em; color: #DCDED6; margin-bottom: 10px; }
-            .section { margin: 30px 40px; }
-            .section-title { font-size: 1.3em; color: #5D726F; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #CED0C3; padding-bottom: 5px; }
-            .info { margin-bottom: 8px; }
-            .footer { background: #B4BAB1; color: #fff; text-align: center; padding: 18px; border-radius: 0 0 20px 20px; font-size: 1em; }
-            .label { color: #859393; font-weight: bold; }
-        </style></head><body>';
-        $html .= '<div class="container">';
-        $html .= '<div class="header">';
-        if (!empty($cv['photo_path'])) {
-            $html .= '<img class="profile-img" src="'.(isset($cv['photo_path']) ? $_SERVER['DOCUMENT_ROOT'].'/'.$cv['photo_path'] : '').'" alt="Photo">';
+        // Créer le PDF directement
+        $pdf = new \FPDF();
+        $pdf->AddPage();
+        $pdf->SetAutoPageBreak(true, 20);
+
+        // Fonctions utilitaires
+        $sectionTitle = function($title) use ($pdf) {
+            $pdf->SetFont('Arial', 'B', 14);
+            $pdf->SetFillColor(133, 147, 147);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->Cell(0, 10, $title, 0, 1, 'L', true);
+            $pdf->SetTextColor(0, 0, 0);
+            $pdf->Ln(5);
+        };
+
+        $infoLine = function($label, $value) use ($pdf) {
+            $pdf->SetFont('Arial', 'B', 11);
+            $pdf->Cell(45, 7, $label . ' :', 0, 0);
+            $pdf->SetFont('Arial', '', 11);
+            $pdf->MultiCell(0, 7, $value, 0, 'L');
+            $pdf->Ln(3);
+        };
+
+        $infoParagraph = function($text) use ($pdf) {
+            $pdf->SetFont('Arial', '', 11);
+            $pdf->MultiCell(0, 6, $text, 0, 'J');
+            $pdf->Ln(4);
+        };
+
+        // En-tête personnalisé
+        if (!empty($cv['photo_path']) && file_exists($cv['photo_path'])) {
+            $pdf->Image($cv['photo_path'], 160, 10, 30, 30);
         }
-        $html .= '<div style="margin-left:'.(!empty($cv['photo_path']) ? '160px' : '0').';min-height:120px;">';
-        $html .= '<div class="title">'.htmlspecialchars($cv['Prenom'] ?? $cv['prenom'] ?? '').' '.htmlspecialchars($cv['Nom'] ?? $cv['Nom'] ?? '').'</div>';
-        $html .= '<div class="subtitle">'.htmlspecialchars($cv['titre_poste'] ?? '').'</div>';
-        $html .= '<div class="info">'.htmlspecialchars($cv['description'] ?? '').'</div>';
-        $html .= '</div></div>';
 
-        $html .= '<div class="section"><div class="section-title">Contact</div>';
-        $html .= '<div class="info"><span class="label">Email:</span> '.htmlspecialchars($cv['Mail'] ?? $cv['email'] ?? '').'</div>';
-        $html .= '<div class="info"><span class="label">Téléphone:</span> '.htmlspecialchars($cv['phone'] ?? $cv['telephone'] ?? '').'</div>';
-        $html .= '<div class="info"><span class="label">Adresse:</span> '.htmlspecialchars($cv['address'] ?? '').'</div>';
-        $html .= '</div>';
+        $pdf->SetFont('Arial', 'B', 20);
+        $pdf->Cell(0, 15, 'CURRICULUM VITAE', 0, 1, 'C');
+        $pdf->Ln(10);
 
-        $html .= '<div class="section"><div class="section-title">Formation</div>';
-        $html .= '<div class="info"><span class="label">Diplôme:</span> '.htmlspecialchars($cv['diploma_name'] ?? '').'</div>';
-        $html .= '<div class="info"><span class="label">Niveau:</span> '.htmlspecialchars($cv['level'] ?? $cv['experience_level'] ?? '').'</div>';
-        $html .= '</div>';
+        // Informations personnelles
+        $pdf->SetFont('Arial', 'B', 18);
+        $pdf->Cell(0, 10, htmlspecialchars($cv['Prenom'] ?? $cv['prenom'] ?? '') . ' ' . htmlspecialchars($cv['Nom'] ?? $cv['Nom'] ?? ''), 0, 1);
 
-        $html .= '<div class="section"><div class="section-title">Expérience Professionnelle</div>';
-        $html .= '<div class="info"><span class="label">Expérience:</span> '.htmlspecialchars($cv['experience_year'] ?? '').' années</div>';
-        $html .= '<div class="info">'.htmlspecialchars($cv['atout'] ?? '').'</div>';
-        $html .= '</div>';
+        $pdf->SetFont('Arial', 'I', 14);
+        $pdf->SetTextColor(100, 100, 100);
+        $pdf->Cell(0, 8, htmlspecialchars($cv['titre_poste'] ?? ''), 0, 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Ln(8);
 
-        $html .= '<div class="section"><div class="section-title">Compétences & Langues</div>';
-        $html .= '<div class="info"><span class="label">Langues:</span> '.htmlspecialchars($cv['languages'] ?? '').'</div>';
-        $html .= '<div class="info"><span class="label">Compétences:</span> '.htmlspecialchars($cv['competance'] ?? 'Conception paysagère, Plantation & Entretien, Gestion de projet').'</div>';
-        $html .= '</div>';
+        // Description
+        if (!empty($cv['description'])) {
+            $infoParagraph(htmlspecialchars($cv['description'] ?? ''));
+            $pdf->Ln(5);
+        }
 
-        $html .= '<div class="section"><div class="section-title">Avantages</div>';
-        $html .= '<div class="info">'.htmlspecialchars($cv['avantages'] ?? '').'</div>';
-        $html .= '</div>';
+        // Sections du CV
+        $sectionTitle('INFORMATIONS DE CONTACT');
+        $infoLine('Email', htmlspecialchars($cv['Mail'] ?? $cv['email'] ?? ''));
+        $infoLine('Téléphone', htmlspecialchars($cv['phone'] ?? $cv['telephone'] ?? ''));
+        $infoLine('Adresse', htmlspecialchars($cv['address'] ?? ''));
+        $pdf->Ln(3);
 
-        $html .= '<div class="section"><div class="section-title">Salaire souhaité & Horaires</div>';
-        $html .= '<div class="info"><span class="label">Salaire souhaité:</span> '.htmlspecialchars($cv['salaire_souhaite'] ?? '').'</div>';
-        $html .= '<div class="info"><span class="label">Horaires:</span> '.htmlspecialchars($cv['horaires'] ?? '').'</div>';
-        $html .= '</div>';
+        $sectionTitle('FORMATION');
+        $infoLine('Diplôme', htmlspecialchars($cv['diploma_name'] ?? ''));
+        $infoLine('Niveau', htmlspecialchars($cv['level'] ?? $cv['experience_level'] ?? ''));
+        $pdf->Ln(3);
 
-        $html .= '<div class="footer">'.htmlspecialchars($cv['Prenom'] ?? $cv['prenom'] ?? '').' '.htmlspecialchars($cv['Nom'] ?? $cv['Nom'] ?? '').' - Paysagiste Passionné</div>';
-        $html .= '</div></body></html>';
+        $sectionTitle('EXPÉRIENCE PROFESSIONNELLE');
+        $infoLine('Années d\'expérience', htmlspecialchars($cv['experience_year'] ?? '') . ' années');
 
-        $mpdf = new \Mpdf\Mpdf();
-        $mpdf->WriteHTML($html);
-        $mpdf->Output('cv.pdf', 'I'); // Affiche dans le navigateur
+        if (!empty($cv['atout'])) {
+            $pdf->SetFont('Arial', 'B', 11);
+            $pdf->Cell(0, 6, 'Atouts:', 0, 1);
+            $pdf->SetFont('Arial', '', 11);
+            $pdf->MultiCell(0, 6, htmlspecialchars($cv['atout'] ?? ''), 0, 'L');
+            $pdf->Ln(2);
+        }
+        $pdf->Ln(3);
+
+        $sectionTitle('COMPÉTENCES & LANGUES');
+        $infoLine('Langues', htmlspecialchars($cv['languages'] ?? ''));
+        $infoLine('Compétences', htmlspecialchars($cv['competance'] ?? 'Conception paysagère, Plantation & Entretien, Gestion de projet'));
+        $pdf->Ln(3);
+
+        // Section Avantages
+        if (!empty($cv['avantages'])) {
+            $sectionTitle('AVANTAGES');
+            $infoParagraph(htmlspecialchars($cv['avantages'] ?? ''));
+            $pdf->Ln(3);
+        }
+
+        $sectionTitle('PRÉTENTIONS SALARIALES & HORAIRES');
+        $infoLine('Salaire souhaité', htmlspecialchars($cv['salaire_souhaite'] ?? ''));
+        $infoLine('Horaires', htmlspecialchars($cv['horaires'] ?? ''));
+        $pdf->Ln(5);
+
+        // Pied de page
+        $pdf->SetY(-30);
+        $pdf->SetFont('Arial', 'I', 10);
+        $pdf->Cell(0, 8, 'Fait le ' . date('d/m/Y'), 0, 1, 'R');
+        $pdf->Cell(0, 8, 'Signature', 0, 1, 'R');
+
+        // Numéro de page
+        $pdf->SetY(-15);
+        $pdf->SetFont('Arial', 'I', 8);
+        $pdf->SetTextColor(128, 128, 128);
+        $pdf->Cell(0, 10, 'Page ' . $pdf->PageNo(), 0, 0, 'C');
+
+        // Générer le PDF
+        $filename = 'CV_' . preg_replace('/[^a-zA-Z0-9]/', '_', $cv['Prenom'] ?? $cv['prenom'] ?? '') . '_' . preg_replace('/[^a-zA-Z0-9]/', '_', $cv['Nom'] ?? $cv['Nom'] ?? '') . '.pdf';
+        $pdf->Output('I', $filename);
         exit;
     }
     public function __construct() {
